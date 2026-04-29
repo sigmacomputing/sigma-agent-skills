@@ -1,0 +1,32 @@
+name: auto-close
+
+# Defense-in-depth behind the repo's `collaborators_only` interaction
+# limit: any pull request opened by a user not in the maintainer allowlist
+# is immediately commented on, closed, and locked. The interaction limit
+# is the primary block (it hides "New PR" from non-collaborators); this
+# workflow catches anything that slips through (e.g. an org member who
+# bypasses the UI).
+
+on:
+  pull_request_target:
+    types: [opened, reopened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  close-non-maintainer-prs:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.user.login != 'mhseiden' }}
+    steps:
+      - name: Comment, close, and lock
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh pr comment "$PR_URL" --body "Hi @$AUTHOR — thanks for the interest, but this repository is a published mirror of skills curated in a private Sigma development repository. Pull requests from outside the maintainer set are not accepted here. For questions, feature requests, or bug reports, please contact Sigma support. This PR will be closed and locked."
+          gh pr close "$PR_URL"
+          gh pr lock "$PR_URL" --reason resolved

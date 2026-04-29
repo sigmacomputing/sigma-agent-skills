@@ -1,0 +1,29 @@
+name: refresh-interaction-limit
+
+# GitHub interaction limits expire (max 6 months). This workflow re-bumps
+# the `collaborators_only` limit weekly so it never lapses. Each run
+# resets the expiry 6 months out, so missing one or two firings is
+# harmless.
+
+on:
+  schedule:
+    - cron: '0 12 * * 1'  # every Monday 12:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  administration: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Re-apply collaborators_only interaction limit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api -X PUT "repos/${{ github.repository }}/interaction-limits" \
+            -f limit=collaborators_only \
+            -f expiry=six_months
+          gh api "repos/${{ github.repository }}/interaction-limits"

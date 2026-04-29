@@ -1,0 +1,54 @@
+name: validate
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  reference-index-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Reference-index coverage per shipped skill
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! -d skills ]]; then
+            echo "no skills/ directory; nothing to validate"
+            exit 0
+          fi
+          fail=0
+          for skill_dir in skills/*/; do
+            skill="$(basename "$skill_dir")"
+            if [[ ! -d "$skill_dir/reference" ]]; then
+              continue
+            fi
+            files_on_disk="$(cd "$skill_dir/reference" && find . -type f \
+              \( -name '*.md' -o -name '*.yaml' \) | sed 's|^\./||' | sort)"
+            files_in_index="$(grep -oE 'reference/[A-Za-z0-9./_-]+\.(md|yaml)' \
+              "$skill_dir/SKILL.md" | sed 's|reference/||' | sort -u)"
+            diff_output="$(comm -3 <(echo "$files_on_disk") <(echo "$files_in_index") || true)"
+            if [[ -n "$diff_output" ]]; then
+              echo "::error file=$skill_dir/SKILL.md::reference-index mismatch for $skill"
+              echo "$diff_output"
+              fail=1
+            fi
+          done
+          exit $fail
+
+      - name: Manifest JSON validity
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in .claude-plugin/plugin.json .claude-plugin/marketplace.json \
+                   .cursor-plugin/plugin.json .cortex-plugin/plugin.json; do
+            if [[ -f "$f" ]]; then
+              jq -e . "$f" >/dev/null
+            fi
+          done
