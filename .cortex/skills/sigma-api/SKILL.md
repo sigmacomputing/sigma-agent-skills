@@ -1,0 +1,1 @@
+../../../skills/sigma-api/SKILL.md
