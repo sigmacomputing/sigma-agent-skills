@@ -6,10 +6,14 @@ name: auto-close
 # The interaction limit is the primary block (it hides "New PR" from
 # non-collaborators); this workflow catches anything that slips through.
 #
-# Membership is determined via `author_association`, which GitHub sets
-# on the PR event. `MEMBER` = org member, `OWNER` = repo owner. Anything
-# else (CONTRIBUTOR, FIRST_TIME_CONTRIBUTOR, NONE, COLLABORATOR added
-# only as an outside collaborator, etc.) is treated as external.
+# Membership is determined via `author_association` plus an explicit
+# maintainer allowlist. `author_association` reports `MEMBER` only when
+# the author's org membership is *public*; private members surface as
+# `CONTRIBUTOR`, which would otherwise auto-close legitimate release
+# PRs. The allowlist closes that gap without requiring a `read:org` PAT.
+#
+# Maintainers: add a GitHub login to MAINTAINERS below to authorize
+# them to open PRs against this mirror.
 
 on:
   pull_request_target:
@@ -21,7 +25,11 @@ permissions:
 jobs:
   close-non-org-prs:
     runs-on: ubuntu-latest
-    if: ${{ !contains(fromJSON('["MEMBER", "OWNER"]'), github.event.pull_request.author_association) }}
+    if: >-
+      ${{
+        !contains(fromJSON('["MEMBER", "OWNER"]'), github.event.pull_request.author_association) &&
+        !contains(fromJSON('["mhseiden"]'), github.event.pull_request.user.login)
+      }}
     steps:
       - name: Comment, close, and lock
         env:
