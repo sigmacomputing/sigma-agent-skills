@@ -1,0 +1,1 @@
+../../../skills/sigma-data-models/SKILL.md

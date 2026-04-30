@@ -1,0 +1,41 @@
+{
+  "name": "sigma-computing",
+  "owner": {
+    "name": "Sigma Computing"
+  },
+  "metadata": {
+    "description": "Sigma Computing agent skills for Claude Code, Cursor, OpenAI Codex, and Snowflake Cortex Code. Build, analyze, and administer Sigma resources programmatically.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "sigma-computing",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/sigmacomputing/sigma-agent-skills.git"
+      },
+      "description": "Sigma Computing agent skills for Claude Code, Cursor, OpenAI Codex, and Snowflake Cortex Code. Build, analyze, and administer Sigma resources programmatically.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Sigma Computing"
+      },
+      "license": "Apache-2.0",
+      "keywords": [
+        "sigma",
+        "sigma-computing",
+        "analytics",
+        "business-intelligence",
+        "dashboards",
+        "workbooks",
+        "data-modeling",
+        "embedded-analytics",
+        "cloud-data-warehouse",
+        "self-service-analytics",
+        "spreadsheets",
+        "ai-agents",
+        "governance"
+      ],
+      "category": "data"
+    }
+  ]
+}
