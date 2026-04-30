@@ -10,12 +10,17 @@ on:
     - cron: '0 12 * * 1'  # every Monday 12:00 UTC
   workflow_dispatch: {}
 
-permissions:
-  administration: write
+# Deny everything by default at the workflow scope. The single job below
+# requests only `administration: write`, so any future job added to this
+# workflow starts from zero permissions instead of inheriting it.
+permissions: {}
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      administration: write
     steps:
       - name: Re-apply collaborators_only interaction limit
         env:
