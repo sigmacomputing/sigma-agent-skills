@@ -1,0 +1,18 @@
+name: probe-author-association
+
+# Throwaway diagnostic. `pull_request` (not `_target`) so the workflow
+# runs from the PR branch's checkout, letting us inspect what GitHub
+# stamps onto the PR event for a private org member.
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  echo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo author_association
+        run: |
+          echo "author_association = ${{ github.event.pull_request.author_association }}"
+          echo "user.login = ${{ github.event.pull_request.user.login }}"
