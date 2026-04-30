@@ -1,8 +1,10 @@
-# Sigma Computing Agent Skills
+# Agent skills for Sigma
 
 Multi-provider agent skills for [Sigma Computing](https://sigmacomputing.com). The same shared skill content runs in **Claude Code**, **Cursor**, **OpenAI Codex**, and **Snowflake Cortex Code**.
 
-This repository is a curated, read-only mirror. Pull requests and issues from non-maintainers are auto-closed — please contact Sigma support for questions or feature requests. Releases are tagged `vX.Y.Z`; see [`CHANGELOG.md`](./CHANGELOG.md) for what shipped in each release.
+This repository is a curated, read-only mirror and is not open for contributions. Pull requests and issues from non-maintainers are auto-closed. For questions and feature requests, contact [Sigma Support](https://help.sigmacomputing.com/docs/sigma-support).
+
+Releases are tagged `vX.Y.Z`. To see what shipped in each release, see [`CHANGELOG.md`](./CHANGELOG.md).
 
 ## Installation
 
@@ -46,7 +48,7 @@ Agents activate these automatically based on the user's request.
 
 ## Team Deployment (Claude Code)
 
-Add this plugin to your project's `.claude/settings.json` so it's available to your whole team automatically:
+To make this plugin available to your entire team in Claude Code automatically, add this plugin to your project's `.claude/settings.json`:
 
 ```json
 {
