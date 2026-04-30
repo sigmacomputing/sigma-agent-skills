@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.1.1 — 2026-04-30
+
+Security hardening for `sigma-api/scripts/get-token.sh` and minor copy edits.
+
+### Changed
+
+- **`sigma-api`** — `scripts/get-token.sh` now pins `$SIGMA_BASE_URL` to the published Sigma cloud hosts, strips the newline `base64` inserts at 76 columns, validates the returned token against the RFC 6750 bearer-token alphabet, and quotes the token via `printf %q` before emitting the `export` line. Together these prevent a hostile or spoofed token endpoint from injecting shell metacharacters into the caller's `eval`.
+- **`sigma-data-models`** — Reworded the Requirements line in `SKILL.md` to describe API-credential permissions in terms of Sigma capabilities (create/edit data models, "Can edit" on the folder), and to point users at their Sigma admin on 403.
+
 ## v0.1.0 — 2026-04-30
 
 Initial public release of `sigma-agent-skills`.
