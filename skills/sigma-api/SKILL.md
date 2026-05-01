@@ -18,16 +18,24 @@ Authenticate against the Sigma Computing REST API and obtain a bearer token. Thi
 
 ## Base URL Selection
 
-The host depends on the user's Sigma cloud. Confirm with the user before exporting:
+The host depends on where the Sigma organization is hosted. Confirm with the user before exporting. The user can also look up their base URL in **Administration > Developer Access** in Sigma.
 
-| Cloud | Base URL |
-|-------|----------|
-| AWS US | `https://aws-api.sigmacomputing.com` |
-| AWS Canada | `https://api.ca.sigmacomputing.com` |
-| AWS Europe | `https://api.eu.sigmacomputing.com` |
-| AWS UK | `https://api.uk.sigmacomputing.com` |
-| GCP | `https://api.sigmacomputing.com` |
-| Azure | `https://api.az.sigmacomputing.com` |
+The authoritative list lives in the Sigma help docs: [Supported regions, data platforms, and features](https://help.sigmacomputing.com/docs/region-warehouse-and-feature-support). Mirror below:
+
+| Cloud | Region | Base URL |
+|-------|--------|----------|
+| AWS | US West (Oregon) | `https://aws-api.sigmacomputing.com` |
+| AWS | US East (N. Virginia) | `https://api.us-a.aws.sigmacomputing.com` |
+| AWS | Canada (Central) | `https://api.ca.aws.sigmacomputing.com` |
+| AWS | Europe (Frankfurt) | `https://api.eu.aws.sigmacomputing.com` |
+| AWS | Asia Pacific (Sydney) | `https://api.au.aws.sigmacomputing.com` |
+| AWS | UK (London) | `https://api.uk.aws.sigmacomputing.com` |
+| Azure | US (Virginia) | `https://api.us.azure.sigmacomputing.com` |
+| Azure | Europe (Netherlands) | `https://api.eu.azure.sigmacomputing.com` |
+| Azure | Canada (Toronto) | `https://api.ca.azure.sigmacomputing.com` |
+| Azure | UK (London) | `https://api.uk.azure.sigmacomputing.com` |
+| GCP | US (Iowa) | `https://api.sigmacomputing.com` |
+| GCP | Saudi Arabia (Dammam) | `https://api.sa.gcp.sigmacomputing.com` |
 
 > `SIGMA_BASE_URL` is the **API host**, not the app URL — `https://aws-api.sigmacomputing.com`, not `https://app.sigmacomputing.com`.
 
