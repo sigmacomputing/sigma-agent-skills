@@ -18,7 +18,7 @@ Authenticate against the Sigma Computing REST API and obtain a bearer token. Thi
 
 ## Base URL Selection
 
-The host depends on the user's Sigma cloud and region. Confirm with the user before exporting. The user can also look up their base URL in **Administration → Developer Access** in the Sigma app.
+The host depends on where the Sigma organization is hosted. Confirm with the user before exporting. The user can also look up their base URL in **Administration > Developer Access** in Sigma.
 
 The authoritative list lives in the Sigma help docs: [Supported regions, data platforms, and features](https://help.sigmacomputing.com/docs/region-warehouse-and-feature-support). Mirror below:
 
