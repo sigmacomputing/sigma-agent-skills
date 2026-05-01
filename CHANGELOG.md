@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.1.2 — 2026-05-01
+
+`sigma-api` region/base-URL list synced with the Sigma help docs.
+
+### Changed
+
+- **`sigma-api`** — Replaced the 6-row Base URL table with the full 12-row list from [Supported regions, data platforms, and features](https://help.sigmacomputing.com/docs/region-warehouse-and-feature-support) and linked that page as the source of truth. Adds US East, AU Sydney, three new Azure regions (Europe, Canada, UK), and GCP Saudi Arabia. Corrects stale AWS Canada/Europe/UK and Azure US hostnames.
+
 ## v0.1.1 — 2026-04-30
 
 Security hardening for `sigma-api/scripts/get-token.sh` and minor copy edits.
