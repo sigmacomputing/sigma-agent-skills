@@ -17,7 +17,7 @@ Round-trip a Sigma data model spec — the JSON definition of pages, sources, co
 
 **Auth:** Authenticate via the `sigma-api` skill first to set `$SIGMA_BASE_URL` and `$SIGMA_API_TOKEN`. This skill assumes both are already exported.
 
-**Requirements:** `curl`, `jq`, `base64`; admin account type; developer API credentials; document owner or "Can edit" access on the destination folder (create) or the existing data model (update).
+**Requirements:** `curl`, `jq`, `base64`. Your Sigma API credentials must have permission to create or edit data models, plus "Can edit" access on the destination folder (for create) or the existing data model (for update). If a request returns 403, ask your Sigma admin to confirm the credential's permissions.
 
 ## Reference Index
 
