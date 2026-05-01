@@ -2,14 +2,19 @@ name: auto-close
 
 # Defense-in-depth behind the repo's `collaborators_only` interaction
 # limit: any pull request opened by a user outside the sigmacomputing
-# GitHub organization is immediately commented on, closed, and locked.
+# maintainer set is immediately commented on, closed, and locked.
 # The interaction limit is the primary block (it hides "New PR" from
 # non-collaborators); this workflow catches anything that slips through.
 #
-# Membership is determined via `author_association`, which GitHub sets
-# on the PR event. `MEMBER` = org member, `OWNER` = repo owner. Anything
-# else (CONTRIBUTOR, FIRST_TIME_CONTRIBUTOR, NONE, COLLABORATOR added
-# only as an outside collaborator, etc.) is treated as external.
+# Membership is determined via `author_association`:
+#   OWNER       — repo owner
+#   MEMBER      — org member with *public* membership (private membership
+#                 is not reflected here, which is why COLLABORATOR matters)
+#   COLLABORATOR — direct repo collaborator (this is the role granted to
+#                 maintainers of this mirror; team-based access does NOT
+#                 produce COLLABORATOR, so add maintainers as direct
+#                 collaborators on the repo)
+# Anything else (CONTRIBUTOR, FIRST_TIME_CONTRIBUTOR, NONE) is external.
 
 on:
   pull_request_target:
@@ -21,7 +26,7 @@ permissions:
 jobs:
   close-non-org-prs:
     runs-on: ubuntu-latest
-    if: ${{ !contains(fromJSON('["MEMBER", "OWNER"]'), github.event.pull_request.author_association) }}
+    if: ${{ !contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.pull_request.author_association) }}
     steps:
       - name: Comment, close, and lock
         env:
