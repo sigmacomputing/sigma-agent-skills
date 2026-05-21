@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.1.3 — 2026-05-21
+
+`sigma-api` base-URL allowlist resynced with the current published hosts.
+
+### Changed
+
+- **`sigma-api`** — `scripts/get-token.sh` allowlist now matches the 12-row Base URL table in `SKILL.md`: adds AWS US East / AU Sydney, Azure US/Europe/Canada/UK, and GCP Saudi Arabia, and corrects stale AWS Canada/Europe/UK and Azure US hostnames. Tightened the `SKILL.md` copy pointing users at **Administration → Developer Access** for their base URL.
+
 ## v0.1.2 — 2026-05-01
 
 `sigma-api` region/base-URL list synced with the Sigma help docs.

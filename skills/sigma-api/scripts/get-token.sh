@@ -29,11 +29,17 @@ done
 # so a hostile token-endpoint response could otherwise become RCE on the caller.
 case "$SIGMA_BASE_URL" in
   https://aws-api.sigmacomputing.com|\
-  https://api.ca.sigmacomputing.com|\
-  https://api.eu.sigmacomputing.com|\
-  https://api.uk.sigmacomputing.com|\
+  https://api.us-a.aws.sigmacomputing.com|\
+  https://api.ca.aws.sigmacomputing.com|\
+  https://api.eu.aws.sigmacomputing.com|\
+  https://api.au.aws.sigmacomputing.com|\
+  https://api.uk.aws.sigmacomputing.com|\
+  https://api.us.azure.sigmacomputing.com|\
+  https://api.eu.azure.sigmacomputing.com|\
+  https://api.ca.azure.sigmacomputing.com|\
+  https://api.uk.azure.sigmacomputing.com|\
   https://api.sigmacomputing.com|\
-  https://api.az.sigmacomputing.com) ;;
+  https://api.sa.gcp.sigmacomputing.com) ;;
   *) echo "Error: SIGMA_BASE_URL must be one of the published Sigma API hosts (see SKILL.md)." >&2; exit 1 ;;
 esac
 
