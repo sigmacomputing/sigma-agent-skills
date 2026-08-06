@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.2.0 — 2026-08-06
+
+Adds `sigma-cli` for the Sigma CLI. 
+
+### Added
+
+- **`sigma-cli`** — Drive the Sigma CLI's introspectable command tree (`sigma api …`) for workbooks, data models, connections/sources, files/folders, identity/access, permissions/sharing, delivery/schedules, materializations, and tenancy/deployments. Covers install/auth setup, the discovery loop for finding the right subcommand, global flags, cursor-based pagination, async job polling, and an exit-code/error triage table.
+
 ## v0.1.3 — 2026-05-21
 
 `sigma-api` base-URL allowlist resynced with the current published hosts.
