@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.3.0 - 2026-09-16
+
+Adds `sigma-workbooks` and `sigma-reports` skills.
+
+### Added
+- **`sigma-workbooks`** - Create, update, and retrieve workbooks using the Sigma REST API. Helps guide the user to correctly use the API and create arbitrarily complex workbooks.
+- **`sigma-reports`** - Create, update, and retrieve workbooks using the Sigma REST API. Helps guide the user to correctly use the API and create arbitarily complex pixel-perfect reports.
+
+### Changed
+- **`sigma-api`** - Now offers `scripts/browser-login.sh` to guide the user through an interactive token exchange using the OAuth flow instead of requiring pre-allocated API keys for each user. Depends on the 'can use OAuth for API' feature permission for the user.
+
 ## v0.2.0 — 2026-08-06
 
 Adds `sigma-cli` for the Sigma CLI. 

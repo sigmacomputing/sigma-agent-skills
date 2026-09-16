@@ -1,0 +1,45 @@
+{
+  "name": "Monthly Statement",
+  "folderId": "<folder-id>",
+  "description": "Minimal fixed-layout report example",
+  "contents": {
+    "schemaVersion": 1,
+    "kind": "report",
+    "config": {
+      "pageWidth": 816,
+      "pageHeight": 1056,
+      "margin": 48
+    },
+    "elements": [
+      {
+        "id": "statement-title",
+        "kind": "text",
+        "body": "# Monthly Statement"
+      },
+      {
+        "id": "footer-text",
+        "kind": "text",
+        "body": "Confidential"
+      }
+    ],
+    "pages": [
+      {
+        "id": "page-1",
+        "name": "Page 1"
+      }
+    ],
+    "panels": [
+      {
+        "id": "report-footer",
+        "type": "footer",
+        "title": "Report footer",
+        "pages": ["page-1"],
+        "config": {
+          "height": 40,
+          "backgroundColor": "#F5F7FA"
+        }
+      }
+    ],
+    "layout": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<Page id=\"page-1\">\n  <Element elementId=\"statement-title\" x=\"48\" y=\"48\" width=\"720\" height=\"72\"/>\n</Page>\n<Panel id=\"report-footer\" type=\"footer\">\n  <Element elementId=\"footer-text\" x=\"48\" y=\"8\" width=\"720\" height=\"24\"/>\n</Panel>"
+  }
+}

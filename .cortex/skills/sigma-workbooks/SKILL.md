@@ -1,0 +1,1 @@
+../../../skills/sigma-workbooks/SKILL.md

@@ -46,6 +46,8 @@ Agents activate these automatically based on the user's request.
 | **sigma-api** | Authenticate against the Sigma REST API (OAuth client credentials, bearer tokens, base URL per cloud). Prerequisite for the other skills. |
 | **sigma-cli** | Install, configure, and use the Sigma CLI to call the Sigma REST API from the command line. |
 | **sigma-data-models** | Create, retrieve, or modify a Sigma data model spec (sources, columns, metrics, relationships, filters, controls, folder groupings, column-level security) via the REST API. |
+| **sigma-workbooks** | Create, retrieve, or modify a Sigma workbook via the REST API. |
+| **sigma-reports** | Create, retrieve or modify a Sigma pixel-perfect report via the REST API. |
 
 ## Team Deployment (Claude Code)
 

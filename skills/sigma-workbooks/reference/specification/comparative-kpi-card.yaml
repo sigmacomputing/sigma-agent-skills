@@ -1,0 +1,63 @@
+---
+name: Comparative KPI card example
+folderId: "<your-folder-id>"
+document:
+  schemaVersion: 1
+  kind: workbook
+  elements:
+  - id: kpi-source
+    kind: table
+    source:
+      kind: warehouse-table
+      connectionId: "<your-connection-id>"
+      path:
+      - YOUR_DB
+      - YOUR_SCHEMA
+      - REVENUE_BY_PERIOD
+    columns:
+    - id: rev_current
+      formula: "[Current Revenue]"
+      name: Current Revenue
+      format:
+        kind: number
+        formatString: "$.3~s"
+    - id: rev_prior
+      formula: "[Prior Revenue]"
+      name: Prior Revenue
+      format:
+        kind: number
+        formatString: "$.3~s"
+    name: KPI Source
+  - id: kpi-revenue
+    kind: kpi-chart
+    name: Revenue
+    source:
+      kind: table
+      elementId: kpi-source
+    columns:
+    - id: rev_current
+      formula: "[KPI Source/Current Revenue]"
+      name: Current Revenue
+      format:
+        kind: number
+        formatString: "$.3~s"
+    - id: rev_prior
+      formula: "[KPI Source/Prior Revenue]"
+      name: Prior Revenue
+    value:
+      columnId: rev_current
+    comparisonColumn:
+      columnId: rev_prior
+    comparison:
+      display: delta
+      colorGood: "#1a7f37"
+      colorBad: "#cf222e"
+  pages:
+  - id: page-kpi-example
+    name: KPI example
+  layout: |
+    <?xml version="1.0" encoding="utf-8"?>
+    <Page type="grid" gridTemplateColumns="repeat(24, 1fr)" gridTemplateRows="auto" id="page-kpi-example">
+      <Element elementId="kpi-revenue" gridColumn="1 / 9" gridRow="1 / 8"/>
+      <Element elementId="kpi-source" gridColumn="1 / 25" gridRow="8 / 20"/>
+    </Page>

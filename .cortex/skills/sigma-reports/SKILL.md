@@ -1,0 +1,1 @@
+../../../skills/sigma-reports/SKILL.md

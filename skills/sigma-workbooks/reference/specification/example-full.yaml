@@ -1,0 +1,884 @@
+---
+workbookId: c3a2a50f-65d3-4bdc-bb4a-d54b5eb712e5
+name: layout driven workbook
+url: https://app.sigmacomputing.com/<your-org>/workbook/layout-driven-workbook-<workbook-slug> # pragma: allowlist secret
+documentVersion: 58
+latestDocumentVersion: 58
+ownerId: FVksufTcpblsOOTZ4pYPgc8XKJE28
+folderId: 04723db6-5dc0-4853-b2b6-71cb65ea0ea5
+createdBy: FVksufTcpblsOOTZ4pYPgc8XKJE28
+updatedBy: FVksufTcpblsOOTZ4pYPgc8XKJE28
+createdAt: '2026-04-06T21:44:37.813Z'
+updatedAt: '2026-04-17T23:46:13.136Z'
+document:
+  schemaVersion: 1
+  kind: workbook
+  elements:
+  - id: VDmtIbjIiM
+    kind: container
+  - kind: control
+    controlId: dashRegion
+    id: ctrl-dash-region
+    name: Store region
+    filters:
+    - source:
+        kind: table
+        elementId: XnyLSupesM
+      columnId: gwtkFeVXOX
+    controlType: list
+    mode: include
+    selectionMode: multiple
+    values: []
+    source:
+      kind: source
+      source:
+        kind: table
+        elementId: XnyLSupesM
+      columnId: gwtkFeVXOX
+  - kind: control
+    controlId: dashDate
+    id: ctrl-dash-date
+    name: Date range
+    filters:
+    - source:
+        kind: table
+        elementId: XnyLSupesM
+      columnId: tyvRcRPZjQ
+    controlType: date-range
+    mode: between
+    includeNulls: when-no-value-is-selected
+  - id: GlZTnW60cY
+    kind: container
+  - id: _vo5wivHIk
+    kind: kpi-chart
+    source:
+      elementId: XnyLSupesM
+      kind: table
+    columns:
+    - id: gBXB7mNDp6
+      formula: Sum([Master/Sales Amount])
+      format:
+        kind: number
+        formatString: "$,.0f"
+    value:
+      columnId: gBXB7mNDp6
+    name: Total sales
+  - id: YBiGG5m5kY
+    kind: kpi-chart
+    source:
+      elementId: XnyLSupesM
+      kind: table
+    columns:
+    - id: dJaWh_79UB
+      formula: Sum([Master/Sales Amount]) - Sum([Master/Cost Amount])
+      format:
+        kind: number
+        formatString: "$,.0f"
+    value:
+      columnId: dJaWh_79UB
+    name: Total profit
+  - id: XSzhu5CtLf
+    kind: line-chart
+    source:
+      elementId: XnyLSupesM
+      kind: table
+    columns:
+    - id: uHU1J_MXtl
+      formula: DateTrunc("month", [Master/Date])
+      name: Month
+      format:
+        kind: datetime
+        formatString: "%b %Y"
+    - id: nUll5YMT5j
+      formula: Sum([Master/Sales Amount])
+      name: Sales
+      format:
+        kind: number
+        formatString: "$,.0f"
+    - id: 7Xt23jjvu-
+      formula: "(Sum([Master/Sales Amount]) - Sum([Master/Cost Amount])) / Sum([Master/Sales
+        Amount])"
+      name: Profit margin
+      format:
+        kind: number
+        formatString: ",.2%"
+    yAxis:
+      columnIds:
+      - nUll5YMT5j
+      - 7Xt23jjvu-
+    xAxis:
+      columnId: uHU1J_MXtl
+    name: Sales over time
+  - id: 17QGJ7ZJxQ
+    kind: kpi-chart
+    source:
+      elementId: XnyLSupesM
+      kind: table
+    columns:
+    - id: wB0OB8xetX
+      formula: CountDistinct([Master/Order Number])
+      format:
+        kind: number
+        formatString: ",.0f"
+    value:
+      columnId: wB0OB8xetX
+    name: Total orders
+  - id: wQ5ezUY81K
+    kind: kpi-chart
+    source:
+      elementId: XnyLSupesM
+      kind: table
+    columns:
+    - id: VKZCXc5o6g
+      formula: Sum([Master/Sales Amount]) / CountDistinct([Master/Order Number])
+      format:
+        kind: number
+        formatString: "$,.2f"
+    value:
+      columnId: VKZCXc5o6g
+    name: Avg order value
+  - id: HWYC72b6av
+    kind: container
+  - id: blo8c1FIpf
+    kind: bar-chart
+    source:
+      elementId: XnyLSupesM
+      kind: table
+    columns:
+    - id: mVC9Hnp2zq
+      formula: "[Master/Store Region]"
+      name: Store Region
+    - id: F2Oz_P4Kyt
+      formula: Sum([Master/Sales Amount])
+      name: Sales
+      format:
+        kind: number
+        formatString: "$,.0f"
+    yAxis:
+      columnIds:
+      - F2Oz_P4Kyt
+    xAxis:
+      columnId: mVC9Hnp2zq
+    stacking: none
+    name: Sales by region
+  - id: z9QWSXomyE
+    kind: donut-chart
+    source:
+      elementId: XnyLSupesM
+      kind: table
+    columns:
+    - id: oJ4m0bMl34
+      formula: "[Master/Product Family]"
+      name: Product Family
+    - id: rMc1XEsnWx
+      formula: Sum([Master/Sales Amount])
+      name: Sales
+      format:
+        kind: number
+        formatString: "$,.0f"
+    color:
+      id: oJ4m0bMl34
+      sort:
+        by: rMc1XEsnWx
+        direction: descending
+    value:
+      id: rMc1XEsnWx
+    name: Sales by product family
+  - id: XnyLSupesM
+    kind: table
+    source:
+      kind: join
+      joins:
+      - left:
+          connectionId: c8808f57-574d-4bb9-9244-5a630e615065
+          kind: warehouse-table
+          path:
+          - SE_DEMO_DB
+          - PLUGS_ELECTRONICS
+          - F_POINT_OF_SALE
+        right:
+          connectionId: c8808f57-574d-4bb9-9244-5a630e615065
+          kind: warehouse-table
+          path:
+          - SE_DEMO_DB
+          - PLUGS_ELECTRONICS
+          - F_SALES
+        columns:
+        - left: "[Order Number]"
+          right: "[Order Number]"
+        name: Sales
+        joinType: left-outer
+      - left:
+          connectionId: c8808f57-574d-4bb9-9244-5a630e615065
+          kind: warehouse-table
+          path:
+          - SE_DEMO_DB
+          - PLUGS_ELECTRONICS
+          - F_POINT_OF_SALE
+        right:
+          connectionId: c8808f57-574d-4bb9-9244-5a630e615065
+          kind: warehouse-table
+          path:
+          - SE_DEMO_DB
+          - PLUGS_ELECTRONICS
+          - D_PRODUCT
+        columns:
+        - left: "[Product Key]"
+          right: "[Product Key]"
+        name: Product
+        joinType: left-outer
+      - left:
+          connectionId: c8808f57-574d-4bb9-9244-5a630e615065
+          kind: warehouse-table
+          path:
+          - SE_DEMO_DB
+          - PLUGS_ELECTRONICS
+          - F_SALES
+        right:
+          connectionId: c8808f57-574d-4bb9-9244-5a630e615065
+          kind: warehouse-table
+          path:
+          - SE_DEMO_DB
+          - PLUGS_ELECTRONICS
+          - D_CUSTOMER
+        columns:
+        - left: "[Cust Key]"
+          right: "[Cust Key]"
+        name: Customer
+        joinType: left-outer
+      - left:
+          connectionId: c8808f57-574d-4bb9-9244-5a630e615065
+          kind: warehouse-table
+          path:
+          - SE_DEMO_DB
+          - PLUGS_ELECTRONICS
+          - F_SALES
+        right:
+          connectionId: c8808f57-574d-4bb9-9244-5a630e615065
+          kind: warehouse-table
+          path:
+          - SE_DEMO_DB
+          - PLUGS_ELECTRONICS
+          - D_STORE
+        columns:
+        - left: "[Store Key]"
+          right: "[Store Key]"
+        name: Store
+        joinType: left-outer
+      - left:
+          connectionId: c8808f57-574d-4bb9-9244-5a630e615065
+          kind: warehouse-table
+          path:
+          - SE_DEMO_DB
+          - PLUGS_ELECTRONICS
+          - F_SALES
+        right:
+          connectionId: c8808f57-574d-4bb9-9244-5a630e615065
+          kind: warehouse-table
+          path:
+          - SE_DEMO_DB
+          - PLUGS_ELECTRONICS
+          - D_DATE
+        columns:
+        - left: "[Date]"
+          right: "[Date Day]"
+        name: Date
+        joinType: left-outer
+      primarySource:
+        connectionId: c8808f57-574d-4bb9-9244-5a630e615065
+        kind: warehouse-table
+        path:
+        - SE_DEMO_DB
+        - PLUGS_ELECTRONICS
+        - F_POINT_OF_SALE
+      name: Sales Star
+    columns:
+    - id: rSjAgTWVKP
+      formula: "[Sales Star/Order Number]"
+      name: Order Number
+    - id: yG8f-dLcZn
+      formula: "[Sales Star/Product Key]"
+      name: Product Key
+    - id: nQ9mvzicNA
+      formula: "[Sales Star/Sales Quantity]"
+      name: Sales Quantity
+    - id: 7xg8A8Aft1
+      formula: "[Sales Star/Sales Amount]"
+      name: Sales Amount
+      format:
+        kind: number
+        formatString: "$,.2f"
+    - id: 1YbyBjlXXD
+      formula: "[Sales Star/Cost Amount]"
+      name: Cost Amount
+      format:
+        kind: number
+        formatString: "$,.2f"
+    - id: 1hT37aJJzs
+      formula: "[Sales/Cust Key]"
+      name: Cust Key
+    - id: FHmaJ0Y7et
+      formula: "[Sales/Store Key]"
+      name: Store Key
+    - id: tyvRcRPZjQ
+      formula: "[Sales/Date]"
+      name: Date
+      format:
+        kind: datetime
+        formatString: "%Y-%m-%d"
+    - id: yNva713xzf
+      formula: "[Sales/Transaction Type]"
+      name: Transaction Type
+    - id: h2VpfPK3if
+      formula: "[Sales/Purchase Method]"
+      name: Purchase Method
+    - id: 4cN6RZxk3N
+      formula: "[Product/Product Name]"
+      name: Product Name
+    - id: xkwdkYukRz
+      formula: "[Product/Product Family]"
+      name: Product Family
+    - id: ZTvD_JJGzX
+      formula: "[Product/Product Line]"
+      name: Product Line
+    - id: QJFGrVOg_O
+      formula: "[Product/Price]"
+      name: Price
+      format:
+        kind: number
+        formatString: "$,.2f"
+    - id: suDr8vb83B
+      formula: "[Customer/Cust Name]"
+      name: Cust Name
+    - id: 7RKm7VOHHM
+      formula: "[Customer/Cust Region]"
+      name: Cust Region
+    - id: ihNgb_U35t
+      formula: "[Customer/Cust State]"
+      name: Cust State
+    - id: w9nDAe3TrH
+      formula: "[Customer/Age Group]"
+      name: Age Group
+    - id: 3n8bZJO54W
+      formula: "[Customer/Loyalty Program]"
+      name: Loyalty Program
+    - id: Mij86WMbij
+      formula: "[Store/Store Name]"
+      name: Store Name
+    - id: gwtkFeVXOX
+      formula: "[Store/Store Region]"
+      name: Store Region
+    - id: PUU07Z72ba
+      formula: "[Store/Store State]"
+      name: Store State
+    - id: BhLGDsPhMI
+      formula: "[Store/Store Size]"
+      name: Store Size
+    - id: UZcLskoBdG
+      formula: "[Date/Year Num]"
+      name: Year Num
+    - id: lP8sJUgbb-
+      formula: "[Date/Month Name]"
+      name: Month Name
+    - id: LVNgCi2evt
+      formula: "[Date/Month Num]"
+      name: Month Num
+    - id: d1wWu7nvfl
+      formula: "[Date/Quarter Name]"
+      name: Quarter Name
+    - id: te1KKUfvSC
+      formula: "[Store/Number of Employees]"
+      name: Employees
+      format:
+        kind: number
+        formatString: ",.0f"
+    - id: 4gyJa1rm7I
+      formula: "[Store/Total Square Footage]"
+      name: Sq Ft
+      format:
+        kind: number
+        formatString: ",.0f"
+    - id: rA6o2zAEDv
+      formula: "[Store/Monthly Rent Cost]"
+      name: Monthly Rent
+      format:
+        kind: number
+        formatString: "$,.0f"
+    name: Master
+    order:
+    - rSjAgTWVKP
+    - yG8f-dLcZn
+    - nQ9mvzicNA
+    - 7xg8A8Aft1
+    - 1YbyBjlXXD
+    - 1hT37aJJzs
+    - FHmaJ0Y7et
+    - tyvRcRPZjQ
+    - yNva713xzf
+    - h2VpfPK3if
+    - 4cN6RZxk3N
+    - xkwdkYukRz
+    - ZTvD_JJGzX
+    - QJFGrVOg_O
+    - suDr8vb83B
+    - 7RKm7VOHHM
+    - ihNgb_U35t
+    - w9nDAe3TrH
+    - 3n8bZJO54W
+    - Mij86WMbij
+    - gwtkFeVXOX
+    - PUU07Z72ba
+    - BhLGDsPhMI
+    - UZcLskoBdG
+    - lP8sJUgbb-
+    - LVNgCi2evt
+    - d1wWu7nvfl
+    - te1KKUfvSC
+    - 4gyJa1rm7I
+    - rA6o2zAEDv
+  - id: 2B07dCkvIY
+    kind: container
+  - id: CE_TB50vql
+    kind: kpi-chart
+    source:
+      elementId: XnyLSupesM
+      kind: table
+    columns:
+    - id: 6bTPYGXwIm
+      formula: CountDistinct([Master/Cust Key])
+      name: Total customers
+      format:
+        kind: number
+        formatString: ",.0f"
+    value:
+      columnId: 6bTPYGXwIm
+    name: Total customers
+  - id: rhbytbOPeu
+    kind: kpi-chart
+    source:
+      elementId: XnyLSupesM
+      kind: table
+    columns:
+    - id: TofUW7R0OU
+      formula: Sum([Master/Sales Amount]) / CountDistinct([Master/Cust Key])
+      name: Avg spend per customer
+      format:
+        kind: number
+        formatString: "$,.2f"
+    value:
+      columnId: TofUW7R0OU
+    name: Avg spend per customer
+  - id: MvuERTuXJl
+    kind: kpi-chart
+    source:
+      elementId: XnyLSupesM
+      kind: table
+    columns:
+    - id: 3B8rMjpiTi
+      formula: CountDistinct([Master/Order Number]) / CountDistinct([Master/Cust Key])
+      name: Orders per customer
+      format:
+        kind: number
+        formatString: ",.2f"
+    value:
+      columnId: 3B8rMjpiTi
+    name: Orders per customer
+  - id: Nf1e5obnQB
+    kind: bar-chart
+    source:
+      elementId: XnyLSupesM
+      kind: table
+    columns:
+    - id: Lg2lRXBlW4
+      formula: "[Master/Loyalty Program]"
+      name: Loyalty Program
+    - id: xUCkExm5o7
+      formula: Sum([Master/Sales Amount])
+      name: Sales
+      format:
+        kind: number
+        formatString: "$,.0f"
+    yAxis:
+      columnIds:
+      - xUCkExm5o7
+    xAxis:
+      columnId: Lg2lRXBlW4
+    stacking: none
+    name: Sales by loyalty program
+  - id: 21okb8vVQR
+    kind: bar-chart
+    source:
+      elementId: XnyLSupesM
+      kind: table
+    columns:
+    - id: difSb6YU9U
+      formula: "[Master/Age Group]"
+      name: Age Group
+    - id: vPxRKXY6SW
+      formula: Sum([Master/Sales Amount])
+      name: Sales
+      format:
+        kind: number
+        formatString: "$,.0f"
+    yAxis:
+      columnIds:
+      - vPxRKXY6SW
+    xAxis:
+      columnId: difSb6YU9U
+    stacking: none
+    name: Sales by age group
+  - id: D4QPEbu1Qi
+    kind: bar-chart
+    source:
+      elementId: XnyLSupesM
+      kind: table
+    columns:
+    - id: yexydlDqUp
+      formula: "[Master/Cust Region]"
+      name: Cust Region
+    - id: sudjQ9sGtv
+      formula: CountDistinct([Master/Cust Key])
+      name: Customers
+      format:
+        kind: number
+        formatString: ",.0f"
+    yAxis:
+      columnIds:
+      - sudjQ9sGtv
+    xAxis:
+      columnId: yexydlDqUp
+    stacking: none
+    name: Customers by region
+  - id: JjDopAGmOK
+    kind: container
+  - kind: control
+    controlId: storesRegion
+    id: ctrl-stores-region
+    name: Store region
+    filters:
+    - source:
+        kind: table
+        elementId: XnyLSupesM
+      columnId: gwtkFeVXOX
+    controlType: list
+    mode: include
+    selectionMode: multiple
+    values: []
+    source:
+      kind: source
+      source:
+        kind: table
+        elementId: XnyLSupesM
+      columnId: gwtkFeVXOX
+  - id: NyXYOVYRa7
+    kind: bar-chart
+    source:
+      elementId: XnyLSupesM
+      kind: table
+    columns:
+    - id: aZp_IttHn8
+      formula: "[Master/Store Name]"
+      name: Store
+    - id: bvo3DHs6PI
+      formula: Sum([Master/Sales Amount])
+      name: Sales
+      format:
+        kind: number
+        formatString: "$,.0f"
+    yAxis:
+      columnIds:
+      - bvo3DHs6PI
+    xAxis:
+      columnId: aZp_IttHn8
+    stacking: none
+    name: Sales per store
+  - id: UxHffLbrEj
+    kind: bar-chart
+    source:
+      elementId: XnyLSupesM
+      kind: table
+    columns:
+    - id: RB_fvo4SFj
+      formula: "[Master/Store Name]"
+      name: Store
+    - id: 9nsFcsTpSL
+      formula: Sum([Master/Sales Amount]) / First([Master/Sq Ft])
+      name: Sales per Sq Ft
+      format:
+        kind: number
+        formatString: "$,.2f"
+    yAxis:
+      columnIds:
+      - 9nsFcsTpSL
+    xAxis:
+      columnId: RB_fvo4SFj
+      sort:
+        by: 9nsFcsTpSL
+        direction: descending
+    stacking: none
+    name: Sales per sq ft
+  - id: iH7JsxANEw
+    kind: bar-chart
+    source:
+      elementId: XnyLSupesM
+      kind: table
+    columns:
+    - id: D_N24yHn5p
+      formula: "[Master/Store Name]"
+      name: Store
+    - id: Ez57X-jegL
+      formula: Sum([Master/Sales Amount]) / First([Master/Employees])
+      name: Sales per Employee
+      format:
+        kind: number
+        formatString: "$,.0f"
+    yAxis:
+      columnIds:
+      - Ez57X-jegL
+    xAxis:
+      columnId: D_N24yHn5p
+      sort:
+        by: Ez57X-jegL
+        direction: descending
+    stacking: none
+    name: Sales per employee
+  - id: yP2VVWFRkl
+    kind: table
+    source:
+      connectionId: c8808f57-574d-4bb9-9244-5a630e615065
+      kind: warehouse-table
+      path:
+      - SE_DEMO_DB
+      - PLUGS_ELECTRONICS
+      - D_STORE
+    columns:
+    - id: jHSXIoUh9U
+      formula: "[Store Name]"
+    - id: 0EfLLN2Rta
+      formula: "[Store Region]"
+    - id: wOPhsdAz_o
+      formula: "[Store State]"
+    - id: IMExPfjk1C
+      formula: "[Store City]"
+    - id: 8aPhd-MzUX
+      formula: "[Store Size]"
+    - id: LZMgfoofAa
+      formula: "[Number of Employees]"
+      format:
+        kind: number
+        formatString: ",.0f"
+    - id: v4lQ9mWC_A
+      formula: "[Total Square Footage]"
+      format:
+        kind: number
+        formatString: ",.0f"
+    - id: zRNAZnRlct
+      formula: "[Monthly Rent Cost]"
+      format:
+        kind: number
+        formatString: "$,.0f"
+    - id: LZIYA0Cwh0
+      formula: "[Online Ordering]"
+    name: Store detail
+    order:
+    - jHSXIoUh9U
+    - 0EfLLN2Rta
+    - wOPhsdAz_o
+    - IMExPfjk1C
+    - 8aPhd-MzUX
+    - LZMgfoofAa
+    - v4lQ9mWC_A
+    - zRNAZnRlct
+    - LZIYA0Cwh0
+  - id: SzU4VtebPV
+    kind: container
+  - kind: control
+    controlId: productsRegion
+    id: ctrl-prod-region
+    name: Store region
+    filters:
+    - source:
+        kind: table
+        elementId: XnyLSupesM
+      columnId: gwtkFeVXOX
+    controlType: list
+    mode: include
+    selectionMode: multiple
+    values: []
+    source:
+      kind: source
+      source:
+        kind: table
+        elementId: XnyLSupesM
+      columnId: gwtkFeVXOX
+  - kind: control
+    controlId: productsDate
+    id: ctrl-prod-date
+    name: Date range
+    filters:
+    - source:
+        kind: table
+        elementId: XnyLSupesM
+      columnId: tyvRcRPZjQ
+    controlType: date-range
+    mode: between
+    includeNulls: when-no-value-is-selected
+  - id: yvc_ZvHZai
+    kind: bar-chart
+    source:
+      elementId: XnyLSupesM
+      kind: table
+    columns:
+    - id: r78AKmsdTc
+      formula: "[Master/Product Name]"
+      name: Product
+    - id: NDS13WYaA8
+      formula: Sum([Master/Sales Amount])
+      name: Sales
+      format:
+        kind: number
+        formatString: "$,.0f"
+    yAxis:
+      columnIds:
+      - NDS13WYaA8
+    xAxis:
+      columnId: r78AKmsdTc
+      sort:
+        by: NDS13WYaA8
+        direction: descending
+    stacking: none
+    filters:
+    - id: Ff80twGxRg
+      columnId: NDS13WYaA8
+      kind: top-n
+      rankingFunction: rank
+      mode: top-n
+      rowCount: 20
+      includeNulls: when-no-value-is-selected
+    name: Sales by product
+  - id: q06x2JTGb3
+    kind: bar-chart
+    source:
+      elementId: XnyLSupesM
+      kind: table
+    columns:
+    - id: 2ge_p25EIO
+      formula: "[Master/Product Family]"
+      name: Product Family
+    - id: gCPyCfh3sd
+      formula: "(Sum([Master/Sales Amount]) - Sum([Master/Cost Amount])) / Sum([Master/Sales
+        Amount])"
+      name: Margin
+      format:
+        kind: number
+        formatString: ",.2%"
+    yAxis:
+      columnIds:
+      - gCPyCfh3sd
+    xAxis:
+      columnId: 2ge_p25EIO
+      sort:
+        by: gCPyCfh3sd
+        direction: descending
+    stacking: none
+    name: Profit margin by product family
+  - id: cPJXbQdtxN
+    kind: table
+    source:
+      elementId: XnyLSupesM
+      kind: table
+    columns:
+    - id: oRuXQtfQKV
+      formula: "[Master/Product Name]"
+    - id: FwZYD7oJQs
+      formula: "[Master/Product Family]"
+    - id: YrpxiI8jY4
+      formula: "[Master/Price]"
+      format:
+        kind: number
+        formatString: "$,.2f"
+    - id: i4X_Hhj7h2
+      formula: Sum([Master/Sales Quantity])
+      format:
+        kind: number
+        formatString: ",.0f"
+    - id: _8kRBbrCfk
+      formula: Sum([Master/Sales Amount])
+      format:
+        kind: number
+        formatString: "$,.0f"
+    - id: kc-dlu1PC_
+      formula: Sum([Master/Sales Amount]) - Sum([Master/Cost Amount])
+      format:
+        kind: number
+        formatString: "$,.0f"
+    - id: fQYX1-lMz1
+      formula: "(Sum([Master/Sales Amount]) - Sum([Master/Cost Amount])) / Sum([Master/Sales
+        Amount])"
+      format:
+        kind: number
+        formatString: ",.2%"
+    name: Product performance
+    groupings:
+    - id: jc9EdrwLk4
+      groupBy:
+      - oRuXQtfQKV
+      - FwZYD7oJQs
+      - YrpxiI8jY4
+      calculations:
+      - i4X_Hhj7h2
+      - _8kRBbrCfk
+      - kc-dlu1PC_
+      - fQYX1-lMz1
+  pages:
+  - id: zTWZZ-jV0-
+    name: PLUGS Dashboard
+  - id: 3Ht0vQc7hD
+    name: Data
+  - id: MspSDgy-qY
+    name: Customers
+  - id: 57aivWea2T
+    name: Stores
+  - id: 1YXIx34u1n
+    name: Products
+  layout: |
+    <?xml version="1.0" encoding="utf-8"?>
+    <Page type="grid" gridTemplateColumns="repeat(24, 1fr)" gridTemplateRows="auto" id="zTWZZ-jV0-">
+      <Container elementId="VDmtIbjIiM" type="grid" gridColumn="1 / 25" gridRow="1 / 4" gridTemplateColumns="repeat(24, 1fr)" gridTemplateRows="auto">
+        <Element elementId="ctrl-dash-region" gridColumn="1 / 13" gridRow="1 / 4"/>
+        <Element elementId="ctrl-dash-date" gridColumn="13 / 25" gridRow="1 / 4"/>
+      </Container>
+      <Container elementId="GlZTnW60cY" type="grid" gridColumn="1 / 25" gridRow="4 / 16" gridTemplateColumns="repeat(24, 1fr)" gridTemplateRows="auto">
+        <Element elementId="_vo5wivHIk" gridColumn="1 / 7" gridRow="1 / 7"/>
+        <Element elementId="YBiGG5m5kY" gridColumn="7 / 13" gridRow="1 / 7"/>
+        <Element elementId="XSzhu5CtLf" gridColumn="13 / 25" gridRow="1 / 13"/>
+        <Element elementId="17QGJ7ZJxQ" gridColumn="1 / 7" gridRow="7 / 13"/>
+        <Element elementId="wQ5ezUY81K" gridColumn="7 / 13" gridRow="7 / 13"/>
+      </Container>
+      <Container elementId="HWYC72b6av" type="grid" gridColumn="1 / 25" gridRow="16 / 28" gridTemplateColumns="repeat(24, 1fr)" gridTemplateRows="auto">
+        <Element elementId="blo8c1FIpf" gridColumn="1 / 13" gridRow="1 / 13"/>
+        <Element elementId="z9QWSXomyE" gridColumn="13 / 25" gridRow="1 / 13"/>
+      </Container>
+    </Page>
+    <Page type="grid" gridTemplateColumns="repeat(24, 1fr)" gridTemplateRows="auto" id="3Ht0vQc7hD">
+      <Element elementId="XnyLSupesM" gridColumn="1 / 25" gridRow="1 / 21"/>
+    </Page>
+    <Page type="grid" gridTemplateColumns="repeat(24, 1fr)" gridTemplateRows="auto" id="MspSDgy-qY">
+      <Container elementId="2B07dCkvIY" type="grid" gridColumn="1 / 25" gridRow="1 / 7" gridTemplateColumns="repeat(24, 1fr)" gridTemplateRows="auto">
+        <Element elementId="CE_TB50vql" gridColumn="1 / 9" gridRow="1 / 7"/>
+        <Element elementId="rhbytbOPeu" gridColumn="9 / 17" gridRow="1 / 7"/>
+        <Element elementId="MvuERTuXJl" gridColumn="17 / 25" gridRow="1 / 7"/>
+      </Container>
+      <Element elementId="Nf1e5obnQB" gridColumn="1 / 13" gridRow="7 / 19"/>
+      <Element elementId="21okb8vVQR" gridColumn="13 / 25" gridRow="7 / 19"/>
+      <Element elementId="D4QPEbu1Qi" gridColumn="1 / 25" gridRow="19 / 31"/>
+    </Page>
+    <Page type="grid" gridTemplateColumns="repeat(24, 1fr)" gridTemplateRows="auto" id="57aivWea2T">
+      <Container elementId="JjDopAGmOK" type="grid" gridColumn="1 / 25" gridRow="1 / 4" gridTemplateColumns="repeat(24, 1fr)" gridTemplateRows="auto">
+        <Element elementId="ctrl-stores-region" gridColumn="1 / 13" gridRow="1 / 4"/>
+      </Container>
+      <Element elementId="NyXYOVYRa7" gridColumn="1 / 25" gridRow="4 / 16"/>
+      <Element elementId="UxHffLbrEj" gridColumn="1 / 13" gridRow="16 / 28"/>
+      <Element elementId="iH7JsxANEw" gridColumn="13 / 25" gridRow="16 / 28"/>
+      <Element elementId="yP2VVWFRkl" gridColumn="1 / 25" gridRow="28 / 48"/>
+    </Page>

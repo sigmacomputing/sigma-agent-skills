@@ -38,6 +38,7 @@ case "$SIGMA_BASE_URL" in
   https://api.eu.azure.sigmacomputing.com|\
   https://api.ca.azure.sigmacomputing.com|\
   https://api.uk.azure.sigmacomputing.com|\
+  https://api.au.azure.sigmacomputing.com|\
   https://api.sigmacomputing.com|\
   https://api.sa.gcp.sigmacomputing.com) ;;
   *) echo "Error: SIGMA_BASE_URL must be one of the published Sigma API hosts (see SKILL.md)." >&2; exit 1 ;;
