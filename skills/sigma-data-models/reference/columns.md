@@ -54,10 +54,9 @@ The prefix depends on the source type:
 - **Another workbook element**: `SourceName` = that element's `name` field.
   - Element named "Sales Table" → `[Sales Table/Revenue]`
 
-- **Join source**: `SourceName` = the `name` field on a specific join leg, or the top-level `name` on the join object (for the `primarySource` leg).
-  - Join with `primarySource.name` implicitly tied to top-level `name: "Sales Star"` → `[Sales Star/Order Number]` for primary columns.
-  - Join leg with `name: "Sales"` → `[Sales/Cust Key]` for that joined table's columns.
-  - Warehouse path segments do **not** become the prefix inside a join — use the join leg's `name` instead.
+- **Join source**: the prefix depends on what each leg is.
+  - Leg that references another element (`{"kind": "table", "elementId": ...}`, the pattern in `sources.md`): use that element's `name` → `[Orders/Revenue]`, `[Customers/City]`.
+  - Leg that is a warehouse table inline in the join: use the `name` set on that leg, or the join's top-level `name` for the `primarySource` leg → `[Sales Star/Order Number]`, `[Sales/Cust Key]`. Warehouse path segments do **not** become the prefix inside a join.
 
 - Column names must match exactly what the describe endpoint returns. **Never invent column names.**
 
@@ -86,7 +85,7 @@ Sum([Revenue])           // valid — aggregation over a sibling column
 
 If you retrieve column names from the `connections/tables/<id>/columns` endpoint, normalize column names by going to title case and removing special characters like `/` and `-` before using them in column references.
 
-For example, `Country/Region` should become `Country Region`, and `Sub-Category` should become `Sub Category`
+For example, `Country/Region` should become `Country Region`, and `Sub-Category` should become `Sub Category`. Some minor words stay lowercase: `NUMBER_OF_EMPLOYEES` becomes `Number of Employees`. Formula references match regardless of case, so `[D_STORE/Number Of Employees]` still resolves (the server stores the canonical casing), but set display `name` values in the canonical form. See the normalization rules in `sources.md`.
 
 ## Operators
 
@@ -151,6 +150,15 @@ If([Status] = "Active", "Active", [Status] = "Pending", "Pending", "Other")
 | `Trim(<text>)` | Remove leading/trailing whitespace |
 | `Length(<text>)` | Character count |
 | `Replace(<text>, <old>, <new>)` | Replace occurrences |
+
+## Cross-Element Functions
+
+Reference another element in the same model by its `name`. See `modeling.md` for when to use these.
+
+| Function | Description |
+|----------|-------------|
+| `Rollup(<aggregate>, <local key>, <external key>, ...)` | Aggregate matching rows of another element: `Rollup(Sum([Orders/Amount]), [Customer Id], [Orders/Customer Id])` |
+| `Lookup(<column>, <local key>, <external key>, ...)` | Return a single value from the matching row of another element |
 
 ## Other Functions
 

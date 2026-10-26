@@ -2,6 +2,8 @@
 
 The `source` property of a table element defines where the data comes from. Replace the entire `source` object with the appropriate type for your use case.
 
+> **Pre-aggregating?** To put fact totals on one row per entity (lifetime sales per store, orders per customer), keep warehouse-table elements and add a `Rollup` column — see `modeling.md`. Reach for a `sql` source only when elements and formulas can't express the logic.
+
 ## warehouse-table (default)
 
 Direct connection to a warehouse table.
@@ -54,6 +56,10 @@ Combine two table elements using a join. Both source tables must be defined as s
 **Join column `op`** (optional, defaults to `=`): `"="`, `"!="`, `"<"`, `"<="`, `">"`, `">="`, `"within"`, `"intersects"`
 
 To use a non-equality join condition, add `"op": "<value>"` alongside `"left"` and `"right"` in a join column object.
+
+**Joining three or more elements:** add one entry to `joins` per hop. A later hop's `left` can be any element already in the join, not only the primary — for lines → orders → stores, the second hop's `left` is the orders element.
+
+Before building a join element for a "join X to Y" request, read `modeling.md` — a relationship is often the better fit.
 
 **Column formulas in the join element** reference each source element by its `name` field, using `[ElementName/Column Name]`. Use the primary/left element name for columns from that table and the right element name for columns from the joined table. If a column name appears in both, qualify it to disambiguate:
 
@@ -108,7 +114,7 @@ Stack rows from multiple sources. `sourceColumns` accepts `null` for columns abs
 
 > **`sourceColumns` and special characters:** `sourceColumns` entries are resolved by column name within the source element's own column set, not re-parsed as a Sigma formula expression. Always use the `name` field value of the column in the source element — not the raw warehouse name. With friendly names ON, a warehouse column `Sub-Category` will have `name: "Sub Category"` (space), so reference it as `"[Sub Category]"`. With a SQL source that aliases it as `"Sub-Category"`, the `name` is `Sub-Category` and you reference it as `"[Sub-Category]"`.
 
-- **Warehouse-table source elements:** Sigma normalizes ALL_CAPS single-word names to title case (`SALES` → `Sales`, `REGION` → `Region`), and splits ALL_CAPS underscore-delimited names on `_`, title-casing each part (`CUSTOMER_ID` → `Customer Id`, `FIRST_NAME` → `First Name`). Digits are preserved in place: `PHONE1` → `Phone1`, `STORE_2` → `Store 2`. Mixed-case quoted identifiers resolve as-is (`Order ID` → `Order ID`, `Last Updated` → `Last Updated`).
+- **Warehouse-table source elements:** Sigma normalizes ALL_CAPS single-word names to title case (`SALES` → `Sales`, `REGION` → `Region`), and splits ALL_CAPS underscore-delimited names on `_`, title-casing each part (`CUSTOMER_ID` → `Customer Id`, `FIRST_NAME` → `First Name`). Some minor words stay lowercase (`NUMBER_OF_EMPLOYEES` → `Number of Employees`); `GET /v2/dataModels/<id>/columns` after create shows the exact names. Digits are preserved in place: `PHONE1` → `Phone1`, `STORE_2` → `Store 2`. Mixed-case quoted identifiers resolve as-is (`Order ID` → `Order ID`, `Last Updated` → `Last Updated`). Formula references match regardless of case, but display `name` values don't get corrected — use the normalized form so names match what Sigma shows elsewhere.
 - **SQL source elements:** The column name is exactly what the SQL outputs (your alias) — no normalization. `SELECT SEGMENT AS "Segment"` produces `[Segment]`; `SELECT "Order ID"` produces `[Order ID]`.
 
 **Example:** A warehouse-table source element on Snowflake's `CUSTOMER_ID`, `FIRST_NAME`, `SALES` columns would be referenced in `sourceColumns` as `"[Customer Id]"`, `"[First Name]"`, `"[Sales]"`.
