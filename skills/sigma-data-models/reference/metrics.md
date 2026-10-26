@@ -2,6 +2,8 @@
 
 Metrics are aggregate measures defined in the `metrics` array of a table element. They standardize common calculations so workbook authors don't need to rewrite them.
 
+> For ratio metrics, measures that combine tables, and choosing between a metric and a column, see `modeling.md`. Write ratios as `Sum(<numerator>) / Sum(<denominator>)`.
+
 ## Metric
 
 ```json

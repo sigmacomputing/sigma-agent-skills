@@ -20,6 +20,8 @@ Relationships are pre-defined joins added to the `relationships` array of a tabl
 
 Both elements must be on the same page. Use the table element `id` values (e.g., `"table-1"`, `"table-2"`) for `targetElementId`.
 
+Define the relationship on the many side (the fact element) and target the one side (the entity element): order lines → orders, orders → stores. Related columns repeat on every fact row, so don't sum an entity's additive attributes (square footage, headcount) through a relationship — define those measures on the entity element. See `modeling.md`.
+
 ## Relationship schema
 
 | Field | Type | Required | Notes |

@@ -36,6 +36,20 @@ Only the explicitly listed users and/or teams can view the column.
 }
 ```
 
+Look up team IDs by name, and user IDs (`memberId`) by email:
+
+```sh
+curl -s -H "Authorization: Bearer $SIGMA_API_TOKEN" \
+  "$SIGMA_BASE_URL/v2/teams?limit=200" | jq -c '.entries[] | {teamId, name}'
+
+curl -s -H "Authorization: Bearer $SIGMA_API_TOKEN" \
+  "$SIGMA_BASE_URL/v2/members?limit=200" | jq -c '.entries[] | {memberId, email}'
+```
+
+If a team the user names doesn't exist, stop and ask. Don't substitute a similarly named team or create one.
+
+The API can confirm a rule is stored, not that it's enforced — the query endpoint runs as you. Tell the user to check enforcement by viewing the model as someone outside the allowed teams. If other elements can reach the restricted column through relationships, ask them to check it from those elements too.
+
 ## User attribute
 
 Only users whose attribute matches the required value can view the column. Useful for dynamic, attribute-based access control.

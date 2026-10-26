@@ -15,7 +15,7 @@ description: >-
 
 Round-trip a Sigma data model spec — the JSON definition of pages, sources, columns, metrics, relationships, filters, controls, folder groupings, and column-level security — through the Sigma REST API.
 
-**Auth:** Authenticate via the `sigma-api` skill first to set `$SIGMA_BASE_URL` and `$SIGMA_API_TOKEN`. This skill assumes both are already exported.
+**Auth:** Authenticate via the `sigma-api` skill first to set `$SIGMA_BASE_URL` and `$SIGMA_API_TOKEN`. This skill assumes both are already exported. If neither is set but the `sigma` CLI is installed and `sigma auth status 2>&1` reports a valid token, set `SIGMA_API_TOKEN=$(sigma auth token)` and set `SIGMA_BASE_URL` to `https://` plus the API host that `sigma auth status` prints (see the `sigma-cli` skill). Tokens are short-lived, so re-read the token in each new shell.
 
 **Requirements:** `curl`, `jq`, `base64`. Your Sigma API credentials must have permission to create or edit data models, plus "Can edit" access on the destination folder (for create) or the existing data model (for update). If a request returns 403, ask your Sigma admin to confirm the credential's permissions.
 
@@ -25,6 +25,7 @@ Feature-specific JSON patterns live in `reference/`. Load each file when you ide
 
 | File | When to load |
 |------|--------------|
+| `reference/modeling.md` | **Any new model that combines tables or defines metrics.** Grain, fan-out, joining facts to dimensions, per-entity or lifetime totals with `Rollup`, ratio metrics ("per square foot", "per employee"), metric vs. column, "define it once" requests, and when custom SQL is warranted. |
 | `reference/columns.md` | Calculated columns, formula columns, derived columns; **renaming a column, changing a formula**, warehouse-column ID conventions, column reference rules. |
 | `reference/metrics.md` | Metrics, aggregate measures, metric timelines, time-series / trend metrics; **adding a metric to an existing table or changing aggregation**. |
 | `reference/relationships.md` | Relationships, foreign-key linking, related tables, cross-table lookups; **adding a relationship between an existing element and a new one** (mixed-ID rule — see `workflows/crud.md`). |
@@ -39,11 +40,11 @@ Feature-specific JSON patterns live in `reference/`. Load each file when you ide
 
 | File | When to load |
 |------|--------------|
-| `reference/workflows/crud.md` | Authoring a new model, retrieving an existing model's spec, or modifying / editing / adding to / changing the source of an existing model. Always load before any POST / GET / PUT against `/v2/dataModels` endpoints. Contains the ID-semantics contrast table (CREATE remap vs GET source-of-truth vs UPDATE preserve), full step-by-step CREATE / GET / UPDATE recipes, and the mixed-ID rule for relationships in updates. |
+| `reference/workflows/crud.md` | Authoring a new model, retrieving an existing model's spec, or modifying / editing / adding to / changing the source of an existing model. Always load before any POST / GET / PUT against `/v2/dataModels` endpoints. Contains the ID-semantics table (GET is the source of truth), full step-by-step CREATE / GET / UPDATE recipes including the verify step and how to get the model's link, and the mixed-ID rule for relationships in updates. |
 
 ## ID Conventions
 
-Cross-cutting rules. Per-workflow ID semantics (remap vs preserve vs mixed cross-references) live in `reference/workflows/crud.md`.
+Cross-cutting rules. Per-workflow ID semantics (what's stored on create, what to preserve on update, mixed cross-references) live in `reference/workflows/crud.md`.
 
 - Short alphanumeric IDs for generated entities: `"page-1"`, `"table-orders"`, `"col-revenue"`.
 - Warehouse column IDs follow `"inode-<tableId>/<COLUMN_NAME>"` — use `"<YOUR_TABLE_INODE>/<COL_NAME>"` as a placeholder.

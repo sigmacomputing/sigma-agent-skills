@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.3.1 - 2026-10-26
+
+`sigma-data-models` modeling guidance, a verify step, and corrected CRUD recipes.
+
+### Added
+- **`sigma-data-models`** - New `reference/modeling.md` covering grain and fan-out, per-entity totals with `Rollup`, ratio metrics, choosing between a metric and a column, and when to use custom SQL. Guides agents to models whose metrics stay correct at every grouping level.
+- **`sigma-data-models`** - Verify step for create and update: read the spec back, compile each element with the element query endpoint, and get the model's link from the spec's `url` field.
+
+### Changed
+- **`sigma-data-models`** - Corrected the create and update ID semantics. Submitted IDs that follow the conventions are stored as submitted.
+- **`sigma-data-models`** - Fixed the destination-folder lookup, including how to find the user's My Documents folder. Clarified the difference between a table's URL ID and its UUID. Documented connection path pagination and scoping by `connectionId`.
+- **`sigma-data-models`** - Reconciled the join column-reference rules between `columns.md` and `sources.md`. Documented joins of three or more elements, relationship direction, cross-element functions, and column name normalization.
+- **`sigma-data-models`** - Added team and member ID lookups for column-level security.
+- **`sigma-data-models`** - Added a fallback for authenticating with a logged-in `sigma` CLI.
+
 ## v0.3.0 - 2026-09-16
 
 Adds `sigma-workbooks` and `sigma-reports` skills.
