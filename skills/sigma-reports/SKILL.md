@@ -3,10 +3,11 @@ name: sigma-reports
 description: >-
   Build, validate, retrieve, and safely update Sigma report code
   representations through /v2/reports. Use for fixed-layout or
-  pixel-perfect reports, invoices, statements, regulatory documents, and PDF
-  delivery. Covers report pages, absolute pixel layout, header/footer panels,
-  common elements, verification, full-contents replacement, and workbook
-  conversion to reports. Do not use for responsive dashboards; use
+  pixel-perfect reports, executive board packets, wide operational tables,
+  invoices, statements, regulatory documents, and PDF delivery. Covers
+  reusable report scaffolds, report pages, absolute pixel layout,
+  header/footer panels, common elements, verification, full-contents
+  replacement, and workbook conversion to reports. Do not use for responsive dashboards; use
   sigma-workbooks instead. Requires SIGMA_API_TOKEN from the sigma-api skill.
 ---
 
@@ -53,6 +54,13 @@ and exported as a one-page landscape PDF with populated data. The support
 matrix records which findings this proves and which schema-published features
 remain gated.
 
+Expanded baseline, verified from a populated five-page PDF on 2026-09-19:
+custom-SQL sources on a hidden data page, comparative KPI scorecards, inline
+SVG hero/band images, themed multi-page output, conditional tables, and a
+column-backed `waterfall-chart` all rendered successfully. This evidence
+supersedes the earlier policy that rejected waterfall charts and treated
+report settings as unproven.
+
 Shared-shape refresh, verified 2026-09-15 against the compiled OpenAPI and a
 non-persistent `dryRun: true` request: common element pointers now use
 `{columnId: ...}`, pivot shelves use `{columnId: ...}`, and
@@ -85,26 +93,63 @@ the live result and preserve the evidence.
 
 ## Recommended workflow
 
-### Step 1: Discover identity, folder, and a reference report
+### Step 1: Discover identity and folder; use references only when needed
 
 ```bash
 curl -sf -H "Authorization: Bearer $SIGMA_API_TOKEN" \
   "$SIGMA_BASE_URL/v2/whoami" > /tmp/whoami.json
-
-curl -sf -H "Authorization: Bearer $SIGMA_API_TOKEN" \
-  "$SIGMA_BASE_URL/v2/reports?limit=50" > /tmp/reports.json
 ```
 
-Use a recent reference report to obtain the current `schemaVersion` and study
-literal element shapes. Do not hardcode a schema version from an example.
+Do not browse arbitrary reports. If the OpenAPI, scaffolds, and references do
+not answer a specific shape question, list reports once, choose one relevant
+reference, cache its spec, and use it only for that question. Obtain the
+current `schemaVersion` from a relevant report GET or a user-provided target;
+do not hardcode the value shown in examples.
 
-### Step 2: Load the relevant references
+```bash
+# List once; pick one relevant reference.
+curl -sf -H "Authorization: Bearer $SIGMA_API_TOKEN" \
+  "$SIGMA_BASE_URL/v2/reports?limit=25" | jq '.entries[] | {reportId, name, path}'
+
+# Cache its spec and read the current schemaVersion.
+curl -sf -H "Authorization: Bearer $SIGMA_API_TOKEN" -H "Accept: application/json" \
+  "$SIGMA_BASE_URL/v2/reports/<reference-report-id>?includeContents=true" \
+  > /tmp/reference-report.json
+jq '.contents.schemaVersion' /tmp/reference-report.json
+```
+
+Load `reference/workflows/discover.md` and resolve the report's source,
+all paginated columns, grain, period rules, and page-slice counts before
+drafting. The raw table-columns endpoint returns only 50 entries by default.
+
+### Step 2: Classify and scaffold the report
+
+Load `reference/workflows/generate.md`. Classify the request as an executive/
+board report, wide operational table, or statement. Generate a complete local
+starting point instead of drafting raw JSON from nothing:
+
+```bash
+ruby scripts/scaffold-report.rb \
+  --template board \
+  --name "Quarterly Business Review" \
+  --folder-id "<folder-id>" \
+  --connection-id "<connection-id>" \
+  --company "ACME" \
+  --output /tmp/report-spec.json
+```
+
+Use `--template wide-table` for multi-page tabloid-landscape tables. Replace
+the synthetic SQL/data labels while retaining the proven geometry, panels,
+hidden data page, and explicit column contracts.
+
+### Step 3: Load the relevant references
 
 Always read:
 
 - `reference/specification/schema.md`
 - `reference/specification/layout.md`
 - `reference/specification/support-matrix.md`
+- `reference/workflows/discover.md`
 - `reference/workflows/validate.md`
 
 Also read `reference/workflows/crud.md` before an API write and
@@ -130,7 +175,7 @@ For shared shapes changed by the released code contract:
 - use `settings.theme.{name,overrides}`, not the removed contents-level
   `themeName`/`themeOverrides`.
 
-### Step 3: Draft a wrapped JSON representation
+### Step 4: Draft the wrapped JSON representation
 
 Start with `reference/specification/example-minimal.json`. The create and
 verify envelope is:
@@ -159,17 +204,26 @@ Rules:
 - Use report panels only for `header` and `footer` regions.
 - Do not emit workbook `gridColumn`, `gridRow`, container, tab, overlay, or
   sidebar syntax.
+- Compute horizontal positions from widths + gaps and vertical positions from
+  a y-cursor. Never rely on unrelated magic-number offsets.
+- Put reusable SQL/data-model sources on a hidden data page and declare every
+  custom-SQL alias through `[Custom SQL/<alias>]`.
+- For wide multi-page output, clone the visible table per page and filter each
+  clone with an explicit page-slice key; do not rely on one tall table flowing
+  without inspection.
 
-### Step 4: Validate locally
+### Step 5: Validate locally
 
 ```bash
 ruby scripts/validate-spec.rb --mode create /tmp/report-spec.json
 ```
 
-Fix every error. Warnings identify schema-only or unknown capabilities that
-need a live verification decision.
+Fix every error. The validator catches pointer casing/targets, grouped-table
+mistakes, SQL contracts, overlaps, geometry, and representation shape.
+Warnings identify schema-only/unknown capabilities or visible detail columns
+that need a deliberate decision.
 
-### Step 5: Verify without persistence
+### Step 6: Verify without persistence
 
 Add `"dryRun": true` to the request body (`contents` is required when
 `dryRun` is true — a 400 results otherwise), then POST to the same create
@@ -191,7 +245,7 @@ true, "warnings": [...]}`; an invalid one returns `{"valid": false, "errors":
 representation and dependencies without creating a report. It does not prove
 the PDF layout is correct or that GET will round-trip every UI feature.
 
-### Step 6: Create only with explicit approval
+### Step 7: Create only with explicit approval
 
 After the user approves the persistent write and destination folder:
 
@@ -208,22 +262,32 @@ curl -sf -X POST \
 Save the submitted representation under a report-ID-specific path. Report the
 report URL, ID, and saved path.
 
-### Step 7: Read back and inspect output
+### Step 8: Read back and inspect output
 
 Immediately GET the representation and compare normalized documents. Confirm
 that optional fields survived and that no element, panel, page, or setting was
 silently dropped. Then export the affected pages to PDF and inspect the actual
 page breaks, clipping, typography, header/footer repetition, and margins.
 
+```bash
+ruby scripts/verify-report.rb "<report-id>"
+ruby scripts/render-report.rb "<report-id>" /tmp/report-render --layout portrait
+```
+
+Read every generated `page-N.png`. For dense tables, verify the final visible
+row and each subtotal; for board reports, verify the narrative hierarchy,
+KPI labels/deltas, chart axes, bridge start/end totals, and negative colors.
+
 Do not claim parity from a successful POST or PUT alone.
 
-### Step 8: Update with a loss check
+### Step 9: Update with a loss check
 
 Follow `reference/workflows/crud.md`. The short version is:
 
 1. GET and back up the current report representation
    (`GET /v2/reports/{id}?includeContents=true`).
-2. Inventory report pages, controls, and elements through their resource APIs.
+2. Inventory the report with `GET /v2/reports/{id}/pages`, `/elements`, and
+   `/controls` (commands in `reference/workflows/crud.md`).
 3. Stop if the inventory contains content absent from the GET representation.
 4. Edit the complete `contents`.
 5. Validate in `--mode update` and dry-run it with `POST /v2/reports` +
@@ -243,6 +307,8 @@ Follow `reference/workflows/crud.md`. The short version is:
 | `reference/specification/layout.md` | Always. Pixel XML, bounds, page and panel placement. |
 | `reference/specification/support-matrix.md` | Always. Safe, gated, unsupported, and workbook-only kinds. |
 | `reference/specification/example-minimal.json` | Starting a new report representation. |
+| `reference/workflows/discover.md` | Finding sources/columns, proving grain, resolving periods, and sizing page slices. |
+| `reference/workflows/generate.md` | Generating executive/board reports, statements, or wide multi-page operational tables. |
 | `reference/workflows/crud.md` | Creating, retrieving, or replacing a report's contents. |
 | `reference/workflows/validate.md` | Before every verify, POST, or PUT and after readback. |
 | `reference/workflows/convert.md` | Converting an existing workbook into a report. |
@@ -255,8 +321,11 @@ Follow `reference/workflows/crud.md`. The short version is:
 | `Invalid kind` after adding a channel or shelf | Replace legacy `{id: ...}` with `{columnId: ...}` and check list-vs-map fields. |
 | A field or element disappears on GET | Treat the representation as lossy; do not PUT until the omitted feature is removed intentionally or preserved another way. |
 | Content overlaps or clips | Check pixel bounds, page dimensions, margins, and repeated panel height; inspect a PDF export. |
+| A wide table clips or loses its final rows | Split it into explicit page-filtered table clones, budget row height, and inspect every rendered page. |
+| `columnID`, `{id: ...}`, or an unknown column pointer appears | Use exact `columnId` and a column ID declared on the owning element; run the local validator before verify. |
+| A custom-SQL source renders unknown columns | Quote aliases in SQL and declare each with `[Custom SQL/<exact alias>]`. |
 | A workbook grid attribute appears in report XML | Replace it with absolute `x`, `y`, `width`, and `height`. |
-| `waterfall-chart`, `progress`, or synced control is requested | Stop or redesign; the published schema is not a safe report-authoring guarantee. |
+| `progress` or synced control is requested | Stop or redesign; the published schema is not a safe report-authoring guarantee. `waterfall-chart` is supported using the proven shape in the board scaffold. |
 | Conversion succeeds with warnings | Review every warning and its element IDs before accepting the generated report. |
 
 Reports are private beta. Prefer explicit evidence and reversible local edits

@@ -50,6 +50,11 @@ sigma api data-models spec update \
 ```
 
 `spec update` is full-replacement, not patch.
+**If `spec get` warns that some content could not be represented, tell the
+user that some content is affected before any `spec update` to this same data
+model — the update writes back only what `spec get` returned, so that content
+is lost — and get their explicit confirmation first when the warning covers a
+large amount of content.**
 
 ## Workflow — migrate a legacy dataset
 

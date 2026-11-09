@@ -259,6 +259,8 @@ curl -s -H "Authorization: Bearer $SIGMA_API_TOKEN" \
   > my-data-model.json
 ```
 
+**If the GET response warns that some content could not be represented, tell the user that some content is affected before any PUT to this same data model — a PUT writes back only what the GET returned, so that content is lost — and get their explicit confirmation first when the warning covers a large amount of content.**
+
 ## UPDATE — Modify an Existing Model
 
 The update endpoint uses **PUT** and requires the **complete** representation, not a diff. Always start from the GET so existing elements are preserved.

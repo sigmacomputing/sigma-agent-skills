@@ -19,11 +19,16 @@ The validator checks:
 - documented unsupported, workbook-only, schema-only, and unknown kinds;
 - released `columnId` pointers, list-shaped series/theme overrides, and
   directional alignment values;
+- local chart/table/pivot/filter pointer targets and `columnId` casing;
+- custom-SQL column contracts and required SQL source fields;
+- grouped-table dimensions, aggregate calculations, and visible detail-column
+  warnings;
 - page `backgroundImage.source` wrappers and removal of legacy theme keys;
 - real XML parsing of Page, Panel, and Element layout nodes;
 - absolute numeric coordinates and dimensions;
 - page and panel outer bounds;
 - exact one-time placement of every element;
+- same-region overlap detection;
 - matching layout roots for pages and panels;
 - rejection of workbook grid/container syntax.
 
@@ -57,6 +62,15 @@ report.
 Non-data elements have no query: a `text` element returns HTTP 404
 `Could not get sheetId`. That is expected, not a defect — only query-backed
 kinds (tables, charts, KPIs) return SQL.
+
+The bundled verifier runs this check across the complete report:
+
+```bash
+ruby scripts/verify-report.rb "<report-id>"
+```
+
+It skips expected non-queryable elements and fails on query endpoint errors,
+unknown columns, circular references, or missing dependencies.
 
 ## 3. Readback and loss detection
 
@@ -96,6 +110,15 @@ Export the affected report to PDF and inspect:
 
 API success cannot prove visual or data parity.
 
+Use the bundled exporter/rasterizer after an approved persistent write:
+
+```bash
+ruby scripts/render-report.rb "<report-id>" /tmp/report-render --layout portrait
+```
+
+It saves `report.pdf` and, when `pdftoppm` is installed, renders every page to
+`page-N.png`. Read every page, not only page 1.
+
 ## Common failures
 
 | Failure | Meaning |
@@ -105,6 +128,9 @@ API success cannot prove visual or data parity.
 | undeclared element in layout | Fix the ID or add the literal element to `contents.elements`. |
 | workbook grid attribute | Replace grid syntax with pixel `x`, `y`, `width`, and `height`. |
 | channel or pivot shelf uses `id` | Replace it with `columnId`; the old pointer shape is rejected. |
+| pointer uses `columnID` or names an undeclared column | Use exact camelCase `columnId` and a column ID declared on that element. |
+| custom SQL column fails or changes case | Quote the SQL alias and bind it with `[Custom SQL/<exact alias>]`. |
+| grouped table exposes detail rows | Hide support columns not listed in `groupBy` or `calculations`; calculations must be aggregate formulas. |
 | `seriesLineAreaStyle` or `colorOverrides` is an object map | Emit a list of `{columnId, style}` or `{name, color}` objects. |
 | alignment uses `start`, `middle`, or `end` | Use released directional values (`left`/`center`/`right`, `top`/`center`/`bottom`). |
 | page background has a flat `url` | Nest it under `backgroundImage.source` with `kind: url`. |
@@ -112,3 +138,4 @@ API success cannot prove visual or data parity.
 | panel type mismatch | Make layout and metadata both `header` or both `footer`. |
 | field disappears on GET | Re-send a non-default value first: a default-valued field is normalized away, not dropped. If it vanishes for every value, treat readback as lossy and do not blindly PUT the result. |
 | verify succeeds but PDF is wrong | Fix physical layout; verify is not a render test. |
+| elements overlap | Recompute row widths/x-positions or y-cursor spacing; do not rely on report element layering. |

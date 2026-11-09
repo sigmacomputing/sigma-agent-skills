@@ -1,7 +1,7 @@
 ---
 name: Comparative KPI card example
 folderId: "<your-folder-id>"
-document:
+contents:
   schemaVersion: 1
   kind: workbook
   elements:

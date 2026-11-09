@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.0.0 - 2026-11-09
+
+Workbooks and reports as code reach 1.0, and every skill now uses the content endpoints.
+
+### Added
+- **`sigma-reports`** - New `discover` and `generate` workflows, a report builder, and `scaffold-report.rb`, `render-report.rb` and `verify-report.rb` scripts for building and checking a report before it is created.
+- **`sigma-workbooks`** - Stack-layout docs and composition lint support for stack layouts.
+- **`sigma-workbooks`** - Two new `validate-spec.sh` checks: columns that reference themselves, and list controls with no value source.
+- **`sigma-api`** - New `scripts/list-table-columns.sh` to look up a table's columns. The workbook and report workflows use it.
+
+### Changed
+- **`sigma-workbooks`**, **`sigma-reports`**, **`sigma-cli`** - Moved off the legacy `/spec` endpoints. Agents read with `GET …?includeContents=true`, validate with `dryRun: true`, create with `contents`, and update with `PUT …/contents`.
+- **`sigma-workbooks`** - Example and fixture specs now use `contents:` instead of `document:`. `POST /v2/workbooks` ignores `document:` and creates a blank workbook.
+- **`sigma-cli`** - Workbook authoring now uses `workbooks get` with `includeContents` and `workbooks create` with `contents` or `dryRun`. Updates go through `curl` to `PUT …/contents` with the CLI's token. Documented folder creation from the CLI.
+- **`sigma-reports`** - Extended the spec validator and documented the report list, reference and inventory endpoints. `waterfall-chart` is now supported.
+- **`sigma-data-models`**, **`sigma-workbooks`**, **`sigma-reports`**, **`sigma-cli`** - If a read warns that some content could not be represented, the agent tells the user before updating. The update writes back only what the read returned, so that content would be lost. For a large amount of affected content, the agent gets explicit confirmation first.
+
 ## v0.3.1 - 2026-10-26
 
 `sigma-data-models` modeling guidance, a verify step, and corrected CRUD recipes.

@@ -20,7 +20,7 @@ This skill helps you build effective Sigma workbooks by **navigating the Sigma O
 
 ## Scope
 
-The workbook **spec** — the JSON you send as the `contents` field in `POST /v2/workbooks` (or `PUT /v2/workbooks/{id}/contents`), defining pages, elements, sources, formulas, and layout. Lifecycle around the workbook (embeds, grants, materialization schedules, bookmarks, sharing) is a separate API surface and out of scope here.
+The workbook **spec** — the JSON you send as the `contents` field in `POST /v2/workbooks` (or `PUT /v2/workbooks/{id}/contents`), defining pages, elements, sources, formulas, and layout. Layout supports grid placement plus responsive stack containers. Lifecycle around the workbook (embeds, grants, materialization schedules, bookmarks, sharing) is a separate API surface and out of scope here.
 
 ## Sources of truth
 
@@ -172,7 +172,7 @@ Load `reference/workflows/discover.md`. Quick summary:
 
 1. `GET /v2/connections` — find the user's connection by name or type.
 2. Ask the user for the table path; verify with `POST /v2/connection/<id>/lookup`.
-3. Discover columns directly via `GET /v2/connections/tables/{inodeId}/columns` (full mechanics in `reference/workflows/discover.md`). Only fall back to asking the user when the endpoint doesn't return what's needed.
+3. Discover columns with the `sigma-api` paginated column helper, which exhausts `GET /v2/connections/tables/{inodeId}/columns` (the raw response holds only 50 columns by default; full mechanics in `reference/workflows/discover.md`). Only fall back to asking the user when the endpoint doesn't return what's needed.
 
 **Never invent column names** — only use names returned by the API or supplied by the user.
 
@@ -223,8 +223,11 @@ Write the spec YAML to disk (e.g., `/tmp/workbook-spec.yaml`). YAML is preferred
 - Follow the formula reference rules in `reference/specification/formulas.md` exactly — most spec errors happen here.
 - **Write explicit `contents.layout` XML whenever elements are non-empty.** It
   is the source of truth for page/container/tab organization.
-- Emit `<Element>` for layout leaves and `<Container>` for nested grids,
-  including repeated-container elements. `<TabbedContainer>` / `<Tab>` remain
+- Emit `<Element>` for layout leaves and `<Container>` for nested grid or stack
+  containers. Use `type="grid"` when children need `gridColumn` / `gridRow`;
+  use `type="stack"` for ordered responsive flow. Stack children omit grid
+  coordinates and may use responsive `<Size>` blocks. Repeated-container
+  elements still use the grid-bodied form. `<TabbedContainer>` / `<Tab>` remain
   valid. Never emit the legacy `<LayoutElement>` / `<GridContainer>` aliases;
   live verification rejects `<LayoutElement>` (`valid:false`; some API
   versions returned HTTP 400 instead).
@@ -270,6 +273,12 @@ If creation fails, read the error, fix the spec, re-validate, retry. See `refere
 ```bash
 ./scripts/verify-workbook.sh "$WORKBOOK_ID"
 ```
+
+The script reads `SIGMA_BASE_URL` and `SIGMA_API_TOKEN` from its environment,
+so they must be **exported**, not just set in your shell. Run `export` on both,
+or put them in front of the command
+(`SIGMA_BASE_URL=… SIGMA_API_TOKEN=… ./scripts/verify-workbook.sh …`). If
+they're missing, the script exits 2 without sending a request.
 
 If any element reports `[FAIL]`, fix the column formulas in the spec (most often a missing source prefix, a self-referencing column, or a friendly-name mismatch with the warehouse — see `reference/specification/formulas.md`), `PUT` the corrected spec, and re-verify.
 

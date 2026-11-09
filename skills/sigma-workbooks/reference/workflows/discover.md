@@ -120,6 +120,11 @@ Ask the user for the fully-qualified table path, **or browse the connection tree
 - **Redshift**: `["SCHEMA", "TABLE"]`
 - **PostgreSQL / MySQL**: `["SCHEMA", "TABLE"]`
 
+The first segment is the warehouse's own database (or project or catalog) name,
+not the Sigma connection's display name. A lookup that returns 404 `Unknown
+connection object` means the path is wrong. Browse for it (below) rather than
+retrying variations.
+
 **Browse instead of guessing.** If an MCP is connected, browse through it first — the **Sigma MCP** (`search`) or a **warehouse-native MCP** (Snowflake, BigQuery, …) is the easiest way to find a table. As a no-MCP fallback, `GET /v2/connections/paths` lists every database / schema / table across the org's connections. Each entry is `{ connectionId, path, urlId }` — the endpoint takes only `page`/`limit` (no connection filter), so filter by `connectionId` client-side:
 
 ```bash
@@ -148,10 +153,14 @@ Use the verified path in the source definition.
 Use the `inodeId` from Step 2 to list the table's columns directly — no need to ask the user or have them query the warehouse:
 
 ```bash
-curl -sf -H "Authorization: Bearer $SIGMA_API_TOKEN" \
-  "$SIGMA_BASE_URL/v2/connections/tables/$INODE_ID/columns" \
+bash <sigma-api-skill-dir>/scripts/list-table-columns.sh "$INODE_ID" \
   | jq '.entries[] | {name, type}'
 ```
+
+The raw endpoint defaults to 50 columns. It returns an opaque
+`nextPageToken`, which must be sent as `pageToken` until absent. The helper
+requests `pageSize=1000`, follows every page, and returns combined entries.
+Never infer that a column is missing from the first response.
 
 Each entry has `name`, `type`, `description`, and `visibility`. Use the `name` value verbatim in formulas — do not invent or transform it.
 

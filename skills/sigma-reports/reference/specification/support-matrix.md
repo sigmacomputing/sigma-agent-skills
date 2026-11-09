@@ -34,6 +34,21 @@ header/footer panel assignment and rendering, complete panel readback, and a
 new document version after PUT. This is a baseline, not blanket proof of every
 optional field on these kinds.
 
+A separate five-page executive report exported on 2026-09-19 additionally
+proved:
+
+- `waterfall-chart`, including a column-backed start point, increase/decrease/
+  total colors, connector lines, and populated PDF output;
+- `image` with an inline SVG data URI used for branded hero and section bands;
+- `divider` in repeating report panels;
+- custom-SQL `table` sources on a hidden data page, with explicit
+  `[Custom SQL/<alias>]` column contracts;
+- comparative KPI cards, conditional table formatting, multiple visible
+  pages, and `settings.theme.overrides` in the exported PDF.
+
+These are now safe authoring baselines. Formula correctness, SQL semantics,
+and physical layout still require per-report verification.
+
 ## Current shared-shape contract
 
 A 2026-09-15 readback of 16 existing reports and non-persistent `/verify`
@@ -57,9 +72,7 @@ shape contract, not blanket report/PDF support for every optional field.
 
 - `area-chart`
 - `control`, except `controlType: synced` and the schema-only `file-upload`
-- `divider`
 - `geography-map`
-- `image`
 - `line-chart`
 - `pivot-table`
 - `point-map`
@@ -90,19 +103,16 @@ warning rather than accepting them silently.
 `controlType: file-upload` is also schema-only. Its upload lifecycle and PDF
 behavior are not established for reports.
 
-The inherited top-level `contents.settings` field is also schema-published but
-not report-proven by this skill. Preserve it unchanged when it appears in a
-readback, warn before PUT, and do not author new theme/navigation settings
-without targeted verify, readback, and PDF evidence. If present,
-`settings.theme.overrides.colorOverrides` uses the released list form
-`[{name, color}]`.
+`contents.settings.theme.overrides` is PDF-proven for colors, categorical
+schemes, and spacing. Keep `colorOverrides` in the released list form
+`[{name, color}]`; preserve unknown settings from readback and verify any
+override outside those proven groups.
 The removed contents-level `themeName` and `themeOverrides` keys must be moved
 to `settings.theme.name` and `settings.theme.overrides`; do not PUT the legacy
 keys because the API can silently drop them.
 
 ## Unsupported kinds and subtypes
 
-- `waterfall-chart`
 - `progress` (gauge/progress presentation)
 - `control` with `controlType: synced`
 

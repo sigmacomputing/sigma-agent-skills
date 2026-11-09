@@ -41,6 +41,15 @@ never send that wrapper to Sigma.
 `margin` defines the intended inset. The local validator enforces the outer
 page bounds and checks that margins leave a positive content area.
 
+Common sizes at Sigma's 96-DPI coordinate scale:
+
+| Paper | Portrait | Landscape |
+|---|---:|---:|
+| US Letter | 816 × 1056 | 1056 × 816 |
+| US Legal | 816 × 1344 | 1344 × 816 |
+| US Tabloid | 1056 × 1632 | 1632 × 1056 |
+| A4 | 794 × 1123 | 1123 × 794 |
+
 Keep authored page content inside the margin unless the design intentionally
 uses bleed. A layout can be mathematically inside the page and still overlap a
 header, footer, or printable margin, so PDF inspection remains mandatory.
@@ -57,6 +66,24 @@ y + height <= H - M - footer height
 The API's absolute coordinate origin and panel repetition behavior should be
 confirmed from a readback/PDF in the target organization before automating a
 large document.
+
+## Computed geometry, not magic offsets
+
+Build rows from width lists and gaps:
+
+```text
+x[0] = left
+x[n] = x[n-1] + width[n-1] + gap
+assert x[last] + width[last] <= right
+```
+
+Advance page sections with a y-cursor (`y += height + gap`). Do not place a
+right-hand column at a literal `margin + 630`; changing an earlier width then
+creates subtle overflow or overlap that the API accepts.
+
+The local validator rejects same-page/panel rectangle overlap. Reports do not
+have a safe layering contract. When a design needs text over a colored hero or
+band, compose the decoration and text into one SVG image element.
 
 ## Forbidden workbook syntax
 

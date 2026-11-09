@@ -53,6 +53,20 @@ Two related traps:
   `sigma api members get --params '{"memberId":"<YOUR_MEMBER_ID>"}'` returns
   `homeFolderId`.
 
+## Create a folder
+
+`files create` takes the folder's details in the `--json` body. `parentId` is
+the folder (or `homeFolderId`) to create it under. The response's `id` is the
+new folder's `folderId` for a later workbook or report create.
+
+```sh
+sigma api files create --params '{}' \
+  --json '{"type":"folder","name":"<FOLDER_NAME>","parentId":"<PARENT_FOLDER_ID>"}'
+```
+
+`type` also selects other kinds of file. Run `sigma api schema files create`
+for the full set.
+
 ## `files get` takes `inodeId`
 
 ```sh
@@ -88,6 +102,6 @@ the difference is invisible in the response.
 ## Not here
 
 - Grants on a file or folder → [`permissions-and-sharing.md`](permissions-and-sharing.md).
-- Workbook contents (pages, elements, spec) → [`workbook-authoring.md`](workbook-authoring.md).
+- Workbook contents (pages, elements, layout) → [`workbook-authoring.md`](workbook-authoring.md).
 - Warehouse schema/table paths under a connection, which are a different
   "path" concept entirely → [`connections-and-sources.md`](connections-and-sources.md).
