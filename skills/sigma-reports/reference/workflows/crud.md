@@ -61,6 +61,8 @@ curl -sf \
 Keep the complete response as the rollback record. It includes outer metadata
 and the report `contents`.
 
+**If the GET response warns that some content could not be represented, tell the user that some content is affected before any PUT to this same report — a PUT writes back only what the GET returned, so that content is lost — and get their explicit confirmation first when the warning covers a large amount of content.**
+
 ## Update
 
 `PUT /v2/reports/{reportId}/contents` is full replacement of `contents` and
@@ -89,8 +91,17 @@ Before PUT:
 1. GET the latest representation (`?includeContents=true`) and preserve
    `documentVersion`.
 2. List the report's pages, elements, and controls through their inventory
-   endpoints.
-3. Compare inventory IDs with the representation.
+   endpoints:
+
+   ```bash
+   for part in pages elements controls; do
+     curl -sf -H "Authorization: Bearer $SIGMA_API_TOKEN" -H "Accept: application/json" \
+       "$SIGMA_BASE_URL/v2/reports/<report-id>/$part" > "/tmp/report-inventory-$part.json"
+   done
+   ```
+
+3. Compare inventory IDs (`pageId` for pages, `elementId` for elements, and
+   each control's ID) with the representation.
 4. Stop if inventory content is absent from `contents`; GET can be lossy.
 5. Preserve every page, panel, element, source, formula, setting, and layout
    entry not intentionally changed.
@@ -105,7 +116,11 @@ resolved by GET, reapplying the intended edit, and repeating validation; do not
 blindly retry without reconciling.
 
 After PUT, GET again and compare normalized representations. Export the
-affected pages as PDF and inspect them.
+affected pages as PDF and inspect them:
+
+```bash
+ruby scripts/render-report.rb "<report-id>" /tmp/report-render --layout portrait
+```
 
 Live-confirmed 2026-08-11: PUT returned HTTP 200, retained the report ID, and
 advanced `documentVersion`/`latestDocumentVersion` from 1 to 2. Header/footer

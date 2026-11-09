@@ -119,6 +119,8 @@ The PUT endpoint replaces the entire `contents` — partial updates are not supp
 
 If you skip the GET and submit a partial `contents`, anything you didn't include is gone.
 
+**If the GET response warns that some content could not be represented, tell the user that some content is affected before any PUT to this same workbook — a PUT writes back only what the GET returned, so that content is lost — and get their explicit confirmation first when the warning covers a large amount of content.**
+
 ## IDs Are Preserved on CREATE
 
 The `id` values you send in `POST /v2/workbooks` — for pages, elements, and columns — are **preserved verbatim**. Layout `elementId` attributes, control bindings, and cross-element `source` references that name your IDs all stay valid after create. You can edit your saved spec and `PUT` it back directly (re-wrapped as `{contents: {...}}` — see below); `GET` the current spec first only when you don't have your latest copy on hand.

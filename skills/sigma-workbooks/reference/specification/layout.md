@@ -32,10 +32,12 @@ Although the OpenAPI marks the string optional, the current API rejects a flat
 element that has no placement. Do not rely on auto-arrange, and do not derive
 membership from the order of `contents.elements`.
 
-## Two-tag grammar
+## Layout modes and two-tag grammar
 
-Live GET specs and `/verify` use `<Element>` for leaves and `<Container>` for
-nested grids (confirmed 2026-08-08). Emit those exact names.
+Page, overlay, and panel roots are grid layouts. Their nested containers can use
+either grid placement or responsive stack flow. Live GET specs and `/verify` use
+`<Element>` for leaves and `<Container>` for both grid and stack containers
+(confirmed 2026-08-08). Emit those exact names.
 `<LayoutElement>` is not a synonym on the wire—`/verify` rejects it as
 `valid:false` (some API versions returned HTTP 400 instead).
 `<GridContainer>` is likewise a legacy captured-artifact alias, not authoring
@@ -57,12 +59,93 @@ Each `<Page id>` matches a `contents.pages[].id`, `contents.overlays[].id`, or
 `contents.elements[].id`; placing it beneath a block is what assigns it there.
 `gridColumn` / `gridRow` use CSS grid line syntax and pages use 24 columns.
 
+## Stack containers
+
+A stack container is a responsive, ordered flow inside a grid page, grid
+container, or tab. The outer stack placement still uses `gridColumn` and
+`gridRow` when its parent is a grid, but its direct children are ordered by XML
+position and do not use grid coordinates.
+Stack and grid configuration are mutually exclusive: a stack has no
+`gridTemplateColumns` or `gridTemplateRows`, while a grid has no stack `Style`.
+
+```xml
+<Page type="grid" gridTemplateColumns="repeat(24, 1fr)" gridTemplateRows="auto" id="overview">
+  <Container elementId="kpi-strip" type="stack" gridColumn="1 / 25" gridRow="1 / 8">
+    <Style>
+      <Desktop direction="row" distribute="space-between" align="center" padding="shown" gap="shown"/>
+      <Mobile direction="column" align="start" gap="shown"/>
+    </Style>
+    <Element elementId="kpi-revenue">
+      <Size>
+        <Desktop width="fill" widthFillFactor="2" height="fixed" heightPixels="160"/>
+        <Mobile width="fill" height="fixed" heightPixels="120"/>
+      </Size>
+    </Element>
+    <Element elementId="kpi-orders"/>
+    <Container elementId="trend-grid" type="grid"
+               gridTemplateColumns="repeat(12, 1fr)" gridTemplateRows="auto">
+      <Element elementId="trend" gridColumn="1 / 13" gridRow="1 / 10"/>
+    </Container>
+  </Container>
+</Page>
+```
+
+### Stack style
+
+`<Style>` is valid only as a child of a stack `<Container>`. `Desktop` and
+`Mobile` are optional responsive overrides; provide either or both.
+
+| Attribute | Values | Meaning |
+|---|---|---|
+| `direction` | `row` (default), `column` | Main axis for ordered children. |
+| `distribute` | `start`, `center`, `end`, `space-between` | Distribution along the main axis. |
+| `align` | `start`, `center`, `end` | Alignment on the cross axis. |
+| `padding` | `shown`, `hidden` | Whether the stack has edge padding. |
+| `gap` | `shown`, `hidden` | Whether the stack has child spacing. |
+| `wrap` | `shown`, `hidden` | Whether row-direction children wrap. |
+
+`wrap` is valid only when the effective direction is `row`. A missing stack
+style uses the product defaults; omit fields that do not need an override.
+
+### Stack child sizing
+
+`<Size>` is optional and can appear once inside a direct stack child. Its
+`Desktop` and `Mobile` children use these attributes:
+
+| Child kind | Width | Height |
+|---|---|---|
+| `<Element>` | `fill`, `fit-content`, or `fixed`, subject to the element kind | `fill`, `fit-content`, or `fixed`, subject to the element kind |
+| Nested stack `<Container>` | `fill`, `fit-content`, or `fixed` | `fill`, `fit-content`, or `fixed` |
+| Nested grid `<Container>` or `<TabbedContainer>` | `fill` or `fixed` | `fixed-rows` |
+
+Use `widthFillFactor` / `heightFillFactor` with `fill` (1x through 8x;
+omitted means 1x), `widthPixels` / `heightPixels` with `fixed` (1 through
+10,000 pixels), and `heightRows` with `fixed-rows` (1 through 100 rows).
+`fit-content` is not valid for a nested grid or tabbed-container width. A
+tabbed-container's fixed row height applies to every tab layout.
+Element kinds also restrict sizing. For example, viz/image/embed/plugin
+elements do not support `fit-content`, while text, button, and most control
+elements do not expose configurable height. Check the element kind's allowed
+flex modes before adding `<Size>`.
+
+Stack children must not carry `gridColumn` or `gridRow`. Put grid-positioned
+children inside a nested `type="grid"` container instead. Only `kind:
+"container"` elements can be stack containers; repeated containers continue to
+use a grid-bodied `<Container>`.
+
 ## `<Container>` vs `<Element>`
 
-- `<Element elementId="X" .../>` — **leaf**. Positions a single element; no children.
-- `<Container elementId="X" ...>...</Container>` — **container**. Wraps child `<Element>`s in its own inner grid.
+- `<Element elementId="X" .../>` — **leaf**. Positions a single element; a
+  stack leaf may contain one `<Size>` block, but never another layout element.
+- `<Container elementId="X" ...>...</Container>` — **container**. A grid
+  container wraps children in its own inner grid; a stack container arranges
+  ordered children responsively.
 
-Use `<Container>` for any tag with nested children — a `<Element>` only renders as a leaf.
+Use `<Container>` for layout tags with nested layout children — an `<Element>`
+only renders as a leaf. `<Style>` and `<Size>` are stack metadata blocks, not
+layout children.
+Use `type="grid"` when children need independent two-dimensional placement and
+`type="stack"` when children should flow in a responsive order.
 
 ## Container elements
 
@@ -160,7 +243,7 @@ Use a plain `<Container>`; there is **no** `<RepeatedContainer>` tag. Children g
 </Container>
 ```
 
-- **Use `<Container>` for repeated containers too.** There is no
+- **Use a grid `<Container>` for repeated containers too.** There is no
   `<RepeatedContainer>` node. Legacy `<GridContainer>` / `<LayoutElement>`
   aliases are read-only compatibility syntax; authored layout uses
   `<Container>` / `<Element>`.
@@ -207,13 +290,21 @@ The actual content for each tab is ordinary flat elements; layout places them.
 Two `<Tab>`s, two elements (`overview-chart`, `detail-table`) each declared once
 in `contents.elements[]`; `<Tab>` order ties them to the labels above.
 
-- **Gotcha (verified):** inside a `<Tab>`, use **bare `<Element>` children only** — never nest a `<Container>` inside a `<Tab>`. A `<Tab>` is already a mini-grid (its own `gridTemplateColumns` / `gridTemplateRows`), so elements position directly in it; a nested `<Container>` scrambles tab render order.
+- **Simple tabs:** use **bare `<Element>` children** when each tab only needs
+  directly positioned leaves. A `<Tab>` is already a mini-grid with its own
+  `gridTemplateColumns` / `gridTemplateRows`.
+- **Nested layouts:** stack support allows a correctly placed `type="stack"`
+  container inside a tab. Preserve grid placement for any nested grid or stack
+  container and verify the rendered order after creation.
 - **When to use it:** several views that are alternates of each other (a summary + a detail table, one view per region/segment) rather than sequential reading — pack them into one region instead of a long scroll or extra pages.
 - **Building it:** hand-authoring the position-mapped `<Tab>` block is error-prone. Use `Composition.tabbed_container(id:, tabs:, grid_column:, grid_row:, tab_bar_alignment: 'left')` in `scripts/lib/composition.rb` — `tabs:` is `[{name:, inner:}]`, where `inner` is the tab's bare-`<Element>` XML (built with `Composition.band`/`Composition.le` or by hand). It returns `{element:, layout:}`, ready to add to `contents.elements[]` and `contents.layout`.
 
-## `gridTemplateRows`: always `"auto"`
+## Grid `gridTemplateRows`: always `"auto"`
 
-Row tracks are always `"auto"` — write `gridTemplateRows="auto"`. Height comes from the children, not from the row track.
+Grid row tracks are always `"auto"` — write `gridTemplateRows="auto"` on
+pages, grid containers, and tab layouts. Height comes from the children, not
+from the grid's row track. Stack containers do not have grid templates; use
+responsive child sizing when a stack needs explicit dimensions.
 
 ### Stacking children inside a container
 
@@ -419,4 +510,7 @@ occupies a grid region and can carry curated destinations. Use
 use a `navigation` element when the menu needs to live inside the page grid
 alongside other content.
 
-To study real grid-container idioms, fetch an existing multi-page workbook's spec (`GET /v2/workbooks/{id}?includeContents=true`, see SKILL.md Steps 1–2). The OpenAPI doesn't model the `layout` XML string, so a live spec is the way to see production layout.
+To study real grid- and stack-container idioms, fetch an existing multi-page
+workbook's spec (`GET /v2/workbooks/{id}?includeContents=true`, see SKILL.md
+Steps 1–2). The OpenAPI doesn't model the `layout` XML string, so a live spec is
+the way to see production layout.

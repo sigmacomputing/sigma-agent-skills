@@ -135,10 +135,21 @@ FORMULA_ISSUES=$(printf '%s' "$SPEC_JSON" | jq -r '
     $cols[]? |
     . as $col |
     ($col.formula // "") as $formula |
+    # A column is not its own sibling. Otherwise `name: Region, formula:
+    # [Region]` is incorrectly accepted even though Sigma resolves it as a
+    # circular self-reference.
+    ($siblings | map(select(. != ($col.name // "")))) as $other_siblings |
     ( [ $formula | scan("\\[[^/\\]]+\\]") | .[1:-1] ] ) as $bare_refs |
-    ( $bare_refs | map(select(. as $ref | $siblings | index($ref) | not)) ) as $unresolved |
+    ( $bare_refs | map(select(. as $ref | $other_siblings | index($ref) | not)) ) as $unresolved |
     select($unresolved | length > 0) |
     "Element: \($element.name // $element.id // "(unnamed)")\n  Column: \($col.name // $col.id // "(unnamed)")\n  Formula: \($formula)\n  Unresolved bare refs: \($unresolved | join(", "))\n"
+')
+
+CONTROL_ISSUES=$(printf '%s' "$SPEC_JSON" | jq -r '
+  .contents.elements[]? |
+    select(.kind == "control" and (.controlType == "list" or .controlType == "segmented")) |
+    select((.source | type) != "object") |
+    "Control: \(.name // .controlId // .id // "(unnamed)")\n  controlType: \(.controlType)\n  Missing value-list source: add a column-bound or manual `source`; `filters` only define targets and leave the picker empty.\n"
 ')
 
 LAYOUT_ISSUES=$(printf '%s' "$SPEC_JSON" | jq -r '
@@ -173,7 +184,7 @@ LAYOUT_ISSUES=$(printf '%s' "$SPEC_JSON" | jq -r '
   ($declared_regions - $placed_regions)[]? | "Page/overlay/panel is missing from contents.layout: \(.)"
 ')
 
-if [ -z "$SHAPE_ISSUES" ] && [ -z "$FORMULA_ISSUES" ] && [ -z "$LAYOUT_ISSUES" ]; then
+if [ -z "$SHAPE_ISSUES" ] && [ -z "$FORMULA_ISSUES" ] && [ -z "$CONTROL_ISSUES" ] && [ -z "$LAYOUT_ISSUES" ]; then
   echo "OK: no obvious formula qualification errors."
   echo ""
   echo "Note: bare refs on warehouse-table sources are accepted as raw warehouse columns."
@@ -207,5 +218,14 @@ if [ -n "$FORMULA_ISSUES" ]; then
   echo ""
   echo "  Wrong:  Count([Question ID])"
   echo "  Right:  Count([AI Usage Data/Question ID])"
+fi
+if [ -n "$CONTROL_ISSUES" ]; then
+  echo "Control wiring errors:"
+  echo ""
+  echo "$CONTROL_ISSUES"
+  echo "A list/segmented control needs two independent bindings:"
+  echo "  source  = values shown in the picker"
+  echo "  filters = elements/columns changed by a selection"
+  echo ""
 fi
 exit 1

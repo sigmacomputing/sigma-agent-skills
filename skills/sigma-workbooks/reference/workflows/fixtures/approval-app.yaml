@@ -2,11 +2,11 @@
 # Replace <FOLDER_ID>, <WRITE_CONNECTION_ID>, <SOURCE_CONNECTION_ID>, and
 # [Source/…] column names from live discovery before POST.
 # Published data entry is UI-only: element kebab → Set data entry permission
-# → Only in published version. That setting is absent from GET /spec.
+# → Only in published version. That setting is absent from a GET ?includeContents=true readback.
 # Architecture: ../approval-apps.md. Intake: ../generate-apps.md.
 name: Approval app
 folderId: "<FOLDER_ID>"
-document:
+contents:
   schemaVersion: 1
   kind: workbook
   elements:

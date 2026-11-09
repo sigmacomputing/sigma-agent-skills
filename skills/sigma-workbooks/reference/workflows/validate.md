@@ -65,7 +65,9 @@ For every formula:
 - Every literal element appears once in `contents.elements`.
 - Every element is placed in `contents.layout`.
 - Layout references only declared elements and known page/overlay/panel IDs.
-- Container children use canonical `<Container>` / `<Element>` tags; tabbed
+- Container children use canonical `<Container>` / `<Element>` tags. Use
+  `type="grid"` for grid-positioned children and `type="stack"` for ordered
+  responsive children; stack children omit `gridColumn` / `gridRow`. Tabbed
   containers use `<TabbedContainer>` / `<Tab>`.
 - Never emit legacy `<GridContainer>` / `<LayoutElement>` aliases.
 - A `page-break` spans exactly one layout row.

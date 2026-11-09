@@ -40,8 +40,8 @@ this skill's workflow.** You're authoring a report from a spec, so always
 include `contents`; a request without it succeeds silently with an empty
 report instead of the one you meant to build, with no error to catch the
 mistake. When present, its schema requires `schemaVersion`, `kind`,
-`elements`, and `pages`. This skill requires explicit layout when elements
-are non-empty.
+`elements`, and `pages`. This skill additionally requires explicit `config`
+for physical page size and explicit layout when elements are non-empty.
 
 A dry run returns either bare metadata (no `valid` key) or `{"valid": true,
 "warnings": [...]}` when it's clean, or `{"valid": false, "errors":
@@ -162,6 +162,36 @@ All literal elements live in `contents.elements`. Pages and panels never have
 nested `elements` arrays. Every element has a unique ID and is placed exactly
 once in layout.
 
+### Custom-SQL source contracts
+
+Place reusable SQL source tables on a hidden data page. Define every returned
+alias explicitly:
+
+```json
+{
+  "id": "src-summary",
+  "kind": "table",
+  "name": "Summary",
+  "source": {
+    "kind": "sql",
+    "connectionId": "<connection-id>",
+    "statement": "SELECT 1 AS \"current_value\""
+  },
+  "columns": [
+    {
+      "id": "summary-current",
+      "name": "current_value",
+      "formula": "[Custom SQL/current_value]"
+    }
+  ]
+}
+```
+
+The local validator requires `connectionId`, `statement`, column names, and a
+`[Custom SQL/<alias>]` reference for SQL-source columns. Quote aliases when the
+warehouse would otherwise change case. The hidden source element still needs
+an absolute layout placement.
+
 ### Column formulas against a `data-model` source
 
 When an element's `source.kind` is `data-model`, a column formula must name the
@@ -213,11 +243,11 @@ the current report API.
 ## Settings
 
 The current shared theme path is `contents.settings.theme`, with optional
-`name` and `overrides`. The removed contents-level `themeName` and
-`themeOverrides` keys can be silently dropped; move them under
-`settings.theme` before verify or PUT. Settings remain schema-published but
-not report/PDF-proven, so preserve readback exactly and follow the support
-matrix.
+`name` and `overrides`. Colors, categorical schemes, and spacing overrides
+are proven in multi-page PDF output. The removed contents-level `themeName`
+and `themeOverrides` keys can be silently dropped; move them under
+`settings.theme` before verify or PUT. Preserve unknown settings from
+readback and follow the support matrix.
 
 ## GET metadata
 

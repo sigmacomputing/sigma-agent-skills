@@ -47,7 +47,7 @@ that way — answer from `list-prefixes` or `--help` instead.
 | Find or list things by folder / path, browse the document tree, move or rename files, scope a list to a location rather than a resource type | [`reference/files-and-folders.md`](reference/files-and-folders.md) |
 | Manage users and teams, assign user attributes, list account-type permissions, configure SAML | [`reference/identity-and-access.md`](reference/identity-and-access.md) |
 | Grant or revoke access on any resource (workbook / workspace / connection / dataset), share workbooks across orgs, manage embed URLs, manage favorites | [`reference/permissions-and-sharing.md`](reference/permissions-and-sharing.md) |
-| Build / inspect / update workbooks, work with the spec endpoint, list elements / pages / columns / queries, manage bookmarks, version history, lineage | [`reference/workbook-authoring.md`](reference/workbook-authoring.md) |
+| Build / inspect / update workbooks (read and write their contents), list elements / pages / columns / queries, manage bookmarks, version history, lineage | [`reference/workbook-authoring.md`](reference/workbook-authoring.md) |
 | Build / inspect / update data models (and migrate from datasets), spec CRUD, columns / elements / sources / lineage | [`reference/data-model-authoring.md`](reference/data-model-authoring.md) |
 | Create / list / test connections, look up paths and tables, swap data sources on workbooks / data-models / templates, manage source-swap-policies | [`reference/connections-and-sources.md`](reference/connections-and-sources.md) |
 | One-off exports, scheduled exports, query download, webhook delivery | [`reference/delivery-and-schedules.md`](reference/delivery-and-schedules.md) |

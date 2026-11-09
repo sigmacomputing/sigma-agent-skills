@@ -17,7 +17,7 @@ the representation. It does not prove that:
 Treat verification as an evidence loop:
 
 ```text
-spec verify → write → readback diff → compile → render → export
+dry-run validate → write → readback diff → compile → render → export
 → cardinality and semantic assertions → published interaction → evidence
 ```
 

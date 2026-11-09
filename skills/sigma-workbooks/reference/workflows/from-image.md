@@ -204,7 +204,7 @@ Do not substitute static explanatory text and call it an agent.
 
 ### Step 0f — Render, compare, and iterate
 
-From here, follow the standard workflow (Steps 5–8). A successful spec verify,
+From here, follow the standard workflow (Steps 5–8). A successful dry run,
 POST, readback, or compile check is **not visual acceptance**.
 
 1. Render every visible page to PNG at approximately the target artifact's

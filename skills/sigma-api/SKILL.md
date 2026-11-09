@@ -118,6 +118,22 @@ After `browser-login.sh` has run once, `scripts/refresh-token.sh` mints a valid 
 
 Run it once per shell (or per phase of work) and reuse the exported `SIGMA_API_TOKEN` across calls; it is cheap to call repeatedly since a valid cache is served without a network round-trip. If it reports the refresh token is expired or revoked, run `browser-login.sh` again.
 
+## Shared paginated metadata helper
+
+API-dependent skills use `scripts/list-table-columns.sh <table-inode-id>` to
+retrieve complete warehouse-table metadata. The underlying endpoint defaults
+to 50 columns; the helper requests 1,000 per page and follows the opaque
+`nextPageToken` as `pageToken` until it is absent.
+
+```bash
+bash scripts/list-table-columns.sh "$INODE_ID" |
+  jq '.entries[] | {name, type, visibility}'
+```
+
+Never conclude that a warehouse column is missing from only the first API
+response. The helper emits one object containing all `entries`, `pageCount`,
+and `totalCount`.
+
 ## Step 3 — Verify the Token
 
 `GET /v2/whoami` is the canonical sanity check that the token is valid and the base URL is correct — use it after each token exchange and any time a later call's response is suspect.

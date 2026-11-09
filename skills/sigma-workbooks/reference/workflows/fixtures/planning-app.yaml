@@ -4,13 +4,13 @@
 # names from live discovery before POST. If the org has a governed data model,
 # rebind source-actual and source-base to kind: data-model (see sources.md).
 # Published data entry is UI-only: element kebab → Set data entry permission
-# → Only in published version. That setting is absent from GET /spec.
+# → Only in published version. That setting is absent from a GET ?includeContents=true readback.
 # Architecture: ../planning-apps.md. Intake: ../generate-apps.md.
 # Look/theme/agent are composed after clone — this file stays unthemed and
 # agent-free. Layout reserves the Review agent rail for generate-apps Step D.5.
 name: Planning app
 folderId: "<FOLDER_ID>"
-document:
+contents:
   schemaVersion: 1
   kind: workbook
   overlays:
